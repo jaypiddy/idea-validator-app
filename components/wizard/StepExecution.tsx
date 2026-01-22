@@ -1,0 +1,63 @@
+'use client';
+import { useFormContext } from 'react-hook-form';
+
+export default function StepExecution() {
+    const { register } = useFormContext();
+
+    return (
+        <div className="space-y-6">
+            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-yellow-500">
+                Step 4: Execution
+            </h2>
+            <p className="text-gray-400">Ideas are cheap. Execution is everything.</p>
+
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium mb-1">Estimated Timeline</label>
+                    <p className="text-xs text-neutral-400 mb-2">
+                        Speed costs money. If you need it in 1 month, we have to cut scope aggressively. If you have 6 months, we can build more robustness and features.
+                    </p>
+                    <select
+                        {...register('timeline', { required: true })}
+                        className="w-full bg-neutral-800 border border-neutral-700 rounded p-3 focus:ring-2 focus:ring-yellow-500 outline-none"
+                    >
+                        <option value="">Select a timeline...</option>
+                        <option value="1 month">1 Month</option>
+                        <option value="3 months">3 Months</option>
+                        <option value="6 months+">6 Months+</option>
+                        <option value="No idea">No idea</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-1">Rough Budget</label>
+                    <p className="text-xs text-neutral-400 mb-2">
+                        This is a reality check to match the tech stack to your runway. We can&apos;t build Netflix on a WordPress budget.
+                    </p>
+                    <select
+                        {...register('budget', { required: true })}
+                        className="w-full bg-neutral-800 border border-neutral-700 rounded p-3 focus:ring-2 focus:ring-yellow-500 outline-none"
+                    >
+                        <option value="">Select a budget range...</option>
+                        <option value="$20k - $30k">$20k - $30k</option>
+                        <option value="$30k - $50k">$30k - $50k</option>
+                        <option value="$50k - $100k">$50k - $100k</option>
+                        <option value="$100k - $200k">$100k - $200k</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-1">Who would own this internally after launch?</label>
+                    <p className="text-xs text-neutral-400 mb-2">
+                        The &quot;Owner&quot; determines the long-term tech debt risk. A CTO ensures maintainability. A Marketing Manager prioritizes speed.
+                    </p>
+                    <input
+                        {...register('execution_owner', { required: true })}
+                        className="w-full bg-neutral-800 border border-neutral-700 rounded p-3 focus:ring-2 focus:ring-yellow-500 outline-none"
+                        placeholder="e.g. Me (Non-technical Founder), A hired PM, My Co-founder (CTO)"
+                    />
+                </div>
+            </div>
+        </div>
+    );
+}
