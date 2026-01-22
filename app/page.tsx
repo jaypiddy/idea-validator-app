@@ -10,13 +10,22 @@ import { HowItWorks } from "@/components/HowItWorks";
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center relative overflow-hidden bg-[#0B0F17]">
-      {/* Background Gradients */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[20%] w-[40%] h-[40%] bg-blue-900/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[20%] right-[10%] w-[30%] h-[30%] bg-purple-900/10 rounded-full blur-[100px]" />
+      {/* Background Media */}
+      <div className="absolute top-0 left-0 w-full h-[85vh] overflow-hidden pointer-events-none">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="https://cdn.prod.website-files.com/62a638e43312dd12f0196165%2F688b86be6925726e33aa8e70_jayph_Dozens_of_glowing_arrows1-poster-00001.jpg"
+          className="absolute top-0 left-0 w-full h-full object-cover opacity-60"
+        >
+          <source src="https://cdn.prod.website-files.com/62a638e43312dd12f0196165%2F688b86be6925726e33aa8e70_jayph_Dozens_of_glowing_arrows1-transcode.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F17]/80 via-[#0B0F17]/60 to-[#0B0F17] z-10" />
       </div>
 
-      <main className="flex w-full flex-col items-center justify-center pt-24 pb-12 z-10">
+      <main className="flex w-full flex-col items-center justify-center pt-24 pb-12 z-20">
         <div className="max-w-5xl px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

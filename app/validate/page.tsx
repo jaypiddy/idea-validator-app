@@ -14,7 +14,9 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Card } from '@/components/ui/Card';
 
-const steps = [StepProblem, StepSolution, StepMarket, StepExecution];
+import StepIntro from '@/components/wizard/StepIntro';
+
+const steps = [StepIntro, StepProblem, StepSolution, StepMarket, StepExecution];
 
 export default function ValidatePage() {
     const [currentStep, setCurrentStep] = useState(0);
@@ -42,7 +44,8 @@ export default function ValidatePage() {
 
     const handleNext = async () => {
         const isLastStep = currentStep === steps.length - 1;
-        const valid = await methods.trigger();
+        // Don't validate form on intro step
+        const valid = currentStep === 0 ? true : await methods.trigger();
 
         if (valid) {
             if (isLastStep) {
@@ -58,6 +61,7 @@ export default function ValidatePage() {
                 localStorage.setItem('ideaData', JSON.stringify(currentData));
                 router.push('/report');
             } else {
+                window.scrollTo(0, 0);
                 setCurrentStep((prev) => prev + 1);
             }
         }
@@ -72,21 +76,23 @@ export default function ValidatePage() {
     return (
         <WizardLayout>
             <FormProvider {...methods}>
-                <div className="mb-8 space-y-2">
-                    {/* Progress Bar */}
-                    <div className="flex justify-between text-xs text-neutral-400">
-                        <span>Step {currentStep + 1} of {steps.length}</span>
-                        <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
+                {/* Progress Bar (Hidden on Intro) */}
+                {currentStep > 0 && (
+                    <div className="mb-8 space-y-2 animate-in fade-in duration-300">
+                        <div className="flex justify-between text-xs text-neutral-400">
+                            <span>Step {currentStep} of {steps.length - 1}</span>
+                            <span>{Math.round(((currentStep) / (steps.length - 1)) * 100)}%</span>
+                        </div>
+                        <div className="w-full bg-neutral-900 h-2 rounded-full overflow-hidden border border-neutral-800">
+                            <motion.div
+                                className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${((currentStep) / (steps.length - 1)) * 100}%` }}
+                                transition={{ duration: 0.5, ease: "easeInOut" }}
+                            />
+                        </div>
                     </div>
-                    <div className="w-full bg-neutral-900 h-2 rounded-full overflow-hidden border border-neutral-800">
-                        <motion.div
-                            className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                            transition={{ duration: 0.5, ease: "easeInOut" }}
-                        />
-                    </div>
-                </div>
+                )}
 
                 <Card className="mb-8">
                     <AnimatePresence mode="wait">
@@ -101,21 +107,29 @@ export default function ValidatePage() {
                         </motion.div>
                     </AnimatePresence>
 
-                    <div className="flex justify-between mt-8 pt-8 border-t border-[rgba(255,255,255,0.10)]">
-                        <Button
-                            variant="ghost"
-                            onClick={handleBack}
-                            disabled={currentStep === 0}
-                            className={currentStep === 0 ? 'opacity-0 pointer-events-none' : ''}
-                        >
-                            Back
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={handleNext}
-                        >
-                            {currentStep === steps.length - 1 ? 'Analyze Idea' : 'Next Step'}
-                        </Button>
+                    <div className="flex flex-col items-end mt-8 pt-8 border-t border-[rgba(255,255,255,0.10)]">
+                        <div className="flex justify-between w-full">
+                            <Button
+                                variant="ghost"
+                                onClick={handleBack}
+                                disabled={currentStep === 0}
+                                className={currentStep === 0 ? 'opacity-0 pointer-events-none' : ''}
+                            >
+                                Back
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={handleNext}
+                                className={currentStep === 0 ? 'bg-blue-600 hover:bg-blue-500 px-8' : ''}
+                            >
+                                {currentStep === 0 ? 'Start MVP Analysis' : (currentStep === steps.length - 1 ? 'Analyze Idea' : 'Next Step')}
+                            </Button>
+                        </div>
+                        {currentStep === 0 && (
+                            <p className="text-xs text-neutral-500 mt-3 mr-1">
+                                Takes ~5 minutes. No obligation.
+                            </p>
+                        )}
                     </div>
                 </Card>
 
