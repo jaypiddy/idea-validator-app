@@ -36,13 +36,14 @@ This is the easiest way to set up "Sync between Local and Cloud". Every time you
     -   **Build Type**: Select **"Dockerfile"** (it should auto-detect the one we just made).
     -   Click **Save**.
 5.  **Service Name**: `idea-validator-app`.
-6.  **Region**: Choose one close to your users (e.g., `us-central1` or `us-east1`).
-7.  **Authentication**: Select **"Allow unauthenticated invocations"** (so the public can visit your site).
-8.  **Environment Variables**:
-    -   Expand "Container, Networking, Security".
-    -   Click **"Variables & Secrets"**.
-    -   Add your `GEMINI_API_KEY` and `RESEND_API_KEY` here.
-9.  Click **Create**.
+6.  **Region**: Choose one close to your users (e.g., `us-central1`).
+7.  **Container Port**: Change `8080` to **`3000`** (Next.js default).
+8.  **Authentication**: Select **"Allow unauthenticated invocations"**.
+9.  **Environment Variables** (under "Variables & Secrets"):
+    -   Click **"Add variable"** for each key:
+    -   **Name**: `GEMINI_API_KEY` | **Value**: (Paste your key)
+    -   **Name**: `RESEND_API_KEY` | **Value**: (Paste your key)
+10. Click **Create**.
 
 ## Step 4: Adding Your Custom Domain (Optional)
 If you have a domain (e.g., `validate.justshift.it`):

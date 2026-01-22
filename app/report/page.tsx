@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 
 import { AnalysisResult } from '@/lib/types';
 
+import { Zap, Info, Eye, Ban, Map, Lock, Check, ArrowLeft } from 'lucide-react';
+
 export default function ReportPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -103,7 +105,7 @@ export default function ReportPage() {
                 onClick={() => router.push('/validate')}
                 className="fixed top-6 left-6 text-sm text-neutral-400 hover:text-white flex items-center gap-2 transition-colors z-50 bg-neutral-900/50 backdrop-blur px-4 py-2 rounded-full border border-neutral-800"
             >
-                ← Edit Inputs
+                <ArrowLeft className="w-4 h-4" /> Edit Inputs
             </button>
 
             <div className="max-w-4xl mx-auto space-y-16">
@@ -137,12 +139,13 @@ export default function ReportPage() {
                         </p>
                         <div className="pt-2">
                             <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-medium ${getComplexityColor(result.complexity)}`}>
-                                <span>⚡ Tech Complexity:</span>
+                                <Zap className="w-4 h-4" />
+                                <span>Tech Complexity:</span>
                                 <span>{result.complexity}</span>
                             </div>
                         </div>
                         <div className="flex items-center justify-center gap-2 text-sm text-neutral-500">
-                            <span>ℹ️</span>
+                            <Info className="w-4 h-4" />
                             <p>This score predicts cost of unknowns, not market success.</p>
                         </div>
                     </div>
@@ -169,7 +172,7 @@ export default function ReportPage() {
                         className="bg-red-900/10 p-6 md:p-8 rounded-3xl border border-red-500/20 flex flex-col md:flex-row gap-6 items-start"
                     >
                         <div className="p-3 bg-red-500/10 rounded-xl text-2xl border border-red-500/20">
-                            👁️
+                            <Eye className="w-8 h-8 text-red-400" />
                         </div>
                         <div className="space-y-2">
                             <h3 className="text-red-400 font-bold text-sm uppercase tracking-widest">The Blindspot</h3>
@@ -224,7 +227,10 @@ export default function ReportPage() {
 
                         {/* Fake Kill List */}
                         <div className="bg-neutral-900/30 p-8 rounded-3xl border border-red-900/20">
-                            <h3 className="text-xl font-bold text-red-400 mb-4">🚫 Scope Kill List (Excluded from Phase 1)</h3>
+                            <div className="flex items-center gap-3 mb-4">
+                                <Ban className="w-6 h-6 text-red-400" />
+                                <h3 className="text-xl font-bold text-red-400">Scope Kill List (Excluded from Phase 1)</h3>
+                            </div>
                             <ul className="space-y-3">
                                 <li className="h-4 bg-neutral-800/50 rounded w-3/4"></li>
                                 <li className="h-4 bg-neutral-800/50 rounded w-1/2"></li>
@@ -234,7 +240,10 @@ export default function ReportPage() {
 
                         {/* Fake Roadmap */}
                         <div className="bg-neutral-900/30 p-8 rounded-3xl border border-green-900/20">
-                            <h3 className="text-xl font-bold text-green-400 mb-4">🗺️ {rapidWeeks}-Week Execution Plan</h3>
+                            <div className="flex items-center gap-3 mb-4">
+                                <Map className="w-6 h-6 text-green-400" />
+                                <h3 className="text-xl font-bold text-green-400">{rapidWeeks}-Week Execution Plan</h3>
+                            </div>
                             <div className="space-y-4">
                                 <div className="h-20 bg-neutral-800/50 rounded-xl"></div>
                                 <div className="h-20 bg-neutral-800/50 rounded-xl"></div>
@@ -252,7 +261,7 @@ export default function ReportPage() {
                                 className="bg-neutral-900 border border-neutral-700 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center space-y-6"
                             >
                                 <div className="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto text-3xl">
-                                    🔒
+                                    <Lock className="w-8 h-8" />
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-bold text-white mb-2">Unlock the Full Report</h3>
@@ -290,7 +299,7 @@ export default function ReportPage() {
                                 className="bg-neutral-900 border border-green-900/50 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center space-y-6"
                             >
                                 <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto text-3xl">
-                                    ✓
+                                    <Check className="w-8 h-8" />
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-bold text-white mb-2">Report Sent!</h3>
