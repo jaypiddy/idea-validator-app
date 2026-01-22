@@ -11,8 +11,12 @@ const rubik = Rubik({
 });
 
 export const metadata: Metadata = {
-  title: "Idea Validator",
-  description: "Validate your startup idea with AI",
+  title: "MVP Estimator",
+  description: "Validates and scopes your idea into an MVP.",
+  openGraph: {
+    title: "MVP Estimator",
+    description: "Validates and scopes your idea into an MVP.",
+  },
 };
 
 export default function RootLayout({

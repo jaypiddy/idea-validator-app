@@ -155,11 +155,36 @@ export default function ReportPage() {
                 <div className="bg-neutral-900/40 p-8 rounded-3xl border border-neutral-800 backdrop-blur-sm">
                     <h3 className="text-xl font-bold text-white mb-6">MVP Readiness Breakdown</h3>
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                        <ReadinessBar label="Problem Clarity" score={result.readiness.problem} color="bg-blue-500" />
-                        <ReadinessBar label="Market Pressure" score={result.readiness.market} color="bg-purple-500" />
-                        <ReadinessBar label="Tech Feasibility" score={result.readiness.tech} color="bg-green-500" />
-                        <ReadinessBar label="Differentiation" score={result.readiness.diff} color="bg-orange-500" />
-                        <ReadinessBar label="Execution Risk" score={result.readiness.risk} color="bg-red-500" />
+                        <ReadinessBar
+                            label="Problem Clarity"
+                            score={result.readiness.problem}
+                            color="bg-blue-500"
+                            description="How clearly defined the user pain point is. High score = Focus on a specific, acute problem."
+                        />
+                        <ReadinessBar
+                            label="Market Pressure"
+                            score={result.readiness.market}
+                            color="bg-purple-500"
+                            description="Urgency of demand. High score = 'Hair on fire' problem (Pull). Low score = Requires education (Push)."
+                        />
+                        <ReadinessBar
+                            label="Tech Feasibility"
+                            score={result.readiness.tech}
+                            color="bg-green-500"
+                            description="Ease of implementation. High score = Standard tech/Proven patterns. Low score = Complex R&D needed."
+                        />
+                        <ReadinessBar
+                            label="Differentiation"
+                            score={result.readiness.diff}
+                            color="bg-orange-500"
+                            description="Uniqueness in the market. High score = Clear 'moat' or novel approach. Low score = Commodity."
+                        />
+                        <ReadinessBar
+                            label="Execution Risk"
+                            score={result.readiness.risk}
+                            color="bg-red-500"
+                            description="Operational complexity. High score = Many moving parts/dependencies. Low score = Pure software build."
+                        />
                     </div>
                 </div>
 
@@ -323,12 +348,19 @@ export default function ReportPage() {
     );
 }
 
-function ReadinessBar({ label, score, color }: { label: string, score: number, color: string }) {
+function ReadinessBar({ label, score, color, description }: { label: string, score: number, color: string, description: string }) {
     return (
-        <div className="space-y-2">
-            <div className="flex justify-between items-end h-32 pb-2 relative group">
+        <div className="space-y-3 group/tooltip relative">
+
+            {/* Tooltip Content (appears on hover of the entire block) */}
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 bg-neutral-800 text-xs text-neutral-300 p-3 rounded-lg border border-neutral-700 shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-20 text-center">
+                {description}
+                <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-neutral-800 border-b border-r border-neutral-700 transform rotate-45"></div>
+            </div>
+
+            <div className="flex justify-between items-end h-32 pb-2 relative group overflow-hidden bg-neutral-900/50 rounded-lg border border-white/5">
                 {/* Bar */}
-                <div className="w-full bg-neutral-800 rounded-t-lg relative h-full flex items-end overflow-hidden">
+                <div className="w-full relative h-full flex items-end">
                     <motion.div
                         initial={{ height: 0 }}
                         animate={{ height: `${score}%` }}
@@ -337,11 +369,15 @@ function ReadinessBar({ label, score, color }: { label: string, score: number, c
                     />
                 </div>
                 {/* Score Label (absolute centered) */}
-                <span className="absolute bottom-2 left-0 w-full text-center text-xs font-bold text-black/50 mix-blend-overlay">
+                <span className="absolute bottom-2 left-0 w-full text-center text-xs font-bold text-white/90 drop-shadow-md">
                     {score}
                 </span>
             </div>
-            <p className="text-xs text-center text-neutral-400 font-medium uppercase tracking-tight">{label}</p>
+
+            <div className="flex items-center justify-center gap-1.5 text-neutral-400 group-hover/tooltip:text-neutral-200 transition-colors cursor-help">
+                <p className="text-xs font-medium uppercase tracking-tight text-center">{label}</p>
+                <Info className="w-3 h-3 opacity-50" />
+            </div>
         </div>
     )
 }
