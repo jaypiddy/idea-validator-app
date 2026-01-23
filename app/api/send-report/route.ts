@@ -133,9 +133,10 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, data });
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Email Error:', error);
-        return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return NextResponse.json({ error: message || 'Failed to send email' }, { status: 500 });
     }
 }
 

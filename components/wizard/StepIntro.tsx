@@ -14,19 +14,19 @@ export default function StepIntro() {
             <div className="grid gap-6 md:grid-cols-2">
                 {/* What's about to happen */}
                 <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-blue-400 font-semibold mb-1">
+                    <div className="flex items-center gap-2 text-ps-blue font-semibold mb-1">
                         <Clock className="w-5 h-5" />
-                        <h3>What’s about to happen</h3>
+                        <h3>What&apos;s about to happen</h3>
                     </div>
                     <p className="text-neutral-300 text-sm leading-relaxed">
-                        You’ll answer a short series of questions about your problem, solution, and complexity.
-                        These aren't generic prompts—they are designed to surface <span className="text-white font-medium">hidden risks</span> and <span className="text-white font-medium">scope inflation</span>.
+                        You&apos;ll answer a short series of questions about your problem, solution, and complexity.
+                        These aren&apos;t generic prompts—they are designed to surface <span className="text-white font-medium">hidden risks</span> and <span className="text-white font-medium">scope inflation</span>.
                     </p>
                 </div>
 
                 {/* The Goal */}
                 <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-purple-400 font-semibold mb-1">
+                    <div className="flex items-center gap-2 text-ps-violet font-semibold mb-1">
                         <AlertTriangle className="w-5 h-5" />
                         <h3>The Goal</h3>
                     </div>
@@ -41,8 +41,8 @@ export default function StepIntro() {
 
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Reassurance */}
-                <div className="bg-blue-500/5 border border-blue-500/10 p-4 rounded-xl">
-                    <div className="flex items-center gap-2 text-blue-300 font-semibold mb-2">
+                <div className="bg-ps-blue/5 border border-ps-blue/10 p-4 rounded-xl">
+                    <div className="flex items-center gap-2 text-ps-blue font-semibold mb-2">
                         <ShieldCheck className="w-5 h-5" />
                         <h3>Your Idea is Safe</h3>
                     </div>

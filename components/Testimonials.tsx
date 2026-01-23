@@ -1,22 +1,26 @@
 'use client';
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const testimonials = [
     {
-        quote: "We shaved 3 months off our development cycle by validating the tech stack first. The breakdown was brutally honest and saved us $50k.",
-        author: "Sarah J.",
-        role: "Founder, Fintech Startup",
+        quote: "The Power Shifter team truly feels like an extension of our own. Their flexibility, problem-solving mindset, and ability to pivot without losing momentum made a big impact.",
+        author: "Joseph Santry",
+        role: "Senior Director, Futures Innovation at lululemon",
+        image: "https://storage.googleapis.com/jp-images-for-apps/MVP%20Validator/1718286212323.jpeg"
     },
     {
-        quote: "I thought my idea was too complex for an MVP. This report showed me exactly how to strip it down and launch in 6 weeks.",
-        author: "Michael R.",
-        role: "CTO, SaaS Platform",
+        quote: "Thrilled with the work POWERSHiFTER has done under very tight timelines and customizing the solution for our unique needs.",
+        author: "Achin Kansal",
+        role: "VP of Marketing, Phinity",
+        image: "https://storage.googleapis.com/jp-images-for-apps/MVP%20Validator/1726361063792.jpeg"
     },
     {
-        quote: "Finally, a reality check that isn't just 'yes, we can build it'. The execution roadmap is now our bible for development.",
-        author: "David K.",
-        role: "Product Director",
+        quote: "They have been a sincere pleasure to work with and have enabled the launch of XYON's complex and beautiful commerce site, which we expect will be the foundation of a successful brand.",
+        author: "Simon Pimstone",
+        role: "Co-Founder and CEO, XYON",
+        image: "https://storage.googleapis.com/jp-images-for-apps/MVP%20Validator/1639696128312.jpeg"
     }
 ];
 
@@ -35,7 +39,7 @@ export function Testimonials() {
                         Trusted by product leaders who ship.
                     </h2>
                     <p className="text-neutral-400 max-w-2xl mx-auto">
-                        Don't just take our word for it. See how others are using data to build with confidence.
+                        Don&apos;t just take our word for it. See how others are using data to build with confidence.
                     </p>
                 </motion.div>
 
@@ -49,10 +53,16 @@ export function Testimonials() {
                             viewport={{ once: true }}
                             className="p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
                         >
-                            <p className="text-neutral-300 mb-6 leading-relaxed">"{t.quote}"</p>
+                            <p className="text-neutral-300 mb-6 leading-relaxed">&quot;{t.quote}&quot;</p>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
-                                    {t.author.charAt(0)}
+                                <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/10 shrink-0">
+                                    <Image
+                                        src={t.image}
+                                        alt={t.author}
+                                        fill
+                                        className="object-cover"
+                                        unoptimized
+                                    />
                                 </div>
                                 <div>
                                     <p className="font-semibold text-white">{t.author}</p>

@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 import { AnalysisResult } from '@/lib/types';
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
+import confetti from 'canvas-confetti';
 
 import { Zap, Info, Eye, Ban, Map, Lock, Check, ArrowLeft } from 'lucide-react';
 
@@ -30,12 +32,16 @@ export default function ReportPage() {
                 body: JSON.stringify({ email, report: result }),
             });
 
-            if (!res.ok) throw new Error('Failed to send email');
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Failed to send email');
+            }
 
             setEmailSent(true);
-        } catch (err) {
+        } catch (err: unknown) {
             console.error(err);
-            alert('Failed to send email. Check console.');
+            const message = err instanceof Error ? err.message : 'Unknown error';
+            alert(`Error: ${message}`);
         } finally {
             setSendingEmail(false);
         }
@@ -83,11 +89,38 @@ export default function ReportPage() {
     const loading = isLoading;
     const error = swrError ? 'Failed to analyze your idea. Please try again.' : '';
 
+    const rapidWeeks = result ? Math.max(2, Math.ceil(result.monthsToBuild)) : 0;
+
+    // Confetti Effect
+    useEffect(() => {
+        if (!loading && result && result.score >= 75) {
+            const duration = 3 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+            const interval: NodeJS.Timeout = setInterval(function () {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+
+                // Since particles fall down, start a bit higher than random
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#0060FF', '#FD2E90', '#FFFFFF'] });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#0060FF', '#FD2E90', '#FFFFFF'] });
+            }, 250);
+
+            return () => clearInterval(interval);
+        }
+    }, [result, loading]);
+
     if (loading) return <LoadingScreen />;
     if (error) return <div className="p-8 text-red-500 text-center">{error}</div>;
     if (!result) return null;
-
-    const rapidWeeks = Math.max(2, Math.ceil(result.monthsToBuild));
 
     return (
         <div className="min-h-screen p-6 md:p-12 relative overflow-x-hidden">
@@ -107,7 +140,7 @@ export default function ReportPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <h2 className="text-xl font-medium text-blue-400 mb-2 tracking-wide uppercase">
+                        <h2 className="text-xl font-medium text-ps-blue mb-2 tracking-wide uppercase">
                             Analysis Complete
                         </h2>
                     </motion.div>
@@ -116,9 +149,9 @@ export default function ReportPage() {
                         <motion.h1
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="text-7xl md:text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500 tracking-tighter"
+                            className="text-7xl md:text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-ps-blue to-ps-pink tracking-tighter"
                         >
-                            {result.score}
+                            <AnimatedNumber value={result.score} />
                             <span className="text-4xl text-neutral-600 font-normal">/100</span>
                         </motion.h1>
                     </div>
@@ -148,13 +181,13 @@ export default function ReportPage() {
                         <ReadinessBar
                             label="Problem Clarity"
                             score={result.readiness.problem}
-                            color="bg-blue-500"
+                            color="bg-ps-blue"
                             description="How clearly defined the user pain point is. High score = Focus on a specific, acute problem."
                         />
                         <ReadinessBar
                             label="Market Pressure"
                             score={result.readiness.market}
-                            color="bg-purple-500"
+                            color="bg-ps-violet"
                             description="Urgency of demand. High score = 'Hair on fire' problem (Pull). Low score = Requires education (Push)."
                         />
                         <ReadinessBar
@@ -211,8 +244,8 @@ export default function ReportPage() {
                         </p>
                     </div>
 
-                    <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 p-8 rounded-3xl border border-blue-500/30">
-                        <h3 className="text-blue-400 text-sm uppercase tracking-wider mb-2">Rapid MVP Build</h3>
+                    <div className="bg-gradient-to-br from-ps-blue/20 to-ps-violet/20 p-8 rounded-3xl border border-ps-blue/30">
+                        <h3 className="text-ps-blue text-sm uppercase tracking-wider mb-2">Rapid MVP Build</h3>
                         <p className="text-4xl font-bold text-white mb-2">
                             {rapidWeeks} Weeks
                         </p>
@@ -222,14 +255,14 @@ export default function ReportPage() {
                                 <span>{result.aiHumanMix.aiPercent}%</span>
                             </div>
                             <div className="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-                                <div className="h-full bg-blue-500" style={{ width: `${result.aiHumanMix.aiPercent}%` }} />
+                                <div className="h-full bg-ps-blue" style={{ width: `${result.aiHumanMix.aiPercent}%` }} />
                             </div>
                             <div className="flex justify-between text-xs text-neutral-300 pt-1">
                                 <span>Human Expert Led</span>
                                 <span>{result.aiHumanMix.humanPercent}%</span>
                             </div>
                             <div className="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-                                <div className="h-full bg-purple-500" style={{ width: `${result.aiHumanMix.humanPercent}%` }} />
+                                <div className="h-full bg-ps-violet" style={{ width: `${result.aiHumanMix.humanPercent}%` }} />
                             </div>
                         </div>
                     </div>
@@ -275,7 +308,7 @@ export default function ReportPage() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="bg-neutral-900 border border-neutral-700 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center space-y-6"
                             >
-                                <div className="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto text-3xl">
+                                <div className="w-16 h-16 bg-ps-blue/20 text-ps-blue rounded-full flex items-center justify-center mx-auto text-3xl">
                                     <Lock className="w-8 h-8" />
                                 </div>
                                 <div>
@@ -291,7 +324,7 @@ export default function ReportPage() {
                                         placeholder="Enter your email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full bg-black border border-neutral-700 rounded-xl p-4 text-center focus:ring-2 focus:ring-blue-500 outline-none text-white placeholder:text-neutral-600"
+                                        className="w-full bg-black border border-neutral-700 rounded-xl p-4 text-center focus:ring-2 focus:ring-ps-blue outline-none text-white placeholder:text-neutral-600"
                                         required
                                         disabled={sendingEmail}
                                     />
@@ -410,8 +443,8 @@ function LoadingScreen() {
 
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center space-y-6">
-            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-blue-400 animate-pulse font-mono text-lg">{text}</p>
+            <div className="w-16 h-16 border-4 border-ps-blue border-t-transparent rounded-full animate-spin" />
+            <p className="text-ps-blue animate-pulse font-mono text-lg">{text}</p>
         </div>
     );
 }

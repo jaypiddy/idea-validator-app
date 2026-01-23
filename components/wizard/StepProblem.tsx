@@ -6,7 +6,7 @@ export default function StepProblem() {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-ps-blue to-ps-violet">
                 Step 1: The Problem
             </h2>
             <p className="text-gray-400">Every great product starts with a painful problem. Be specific.</p>
@@ -43,7 +43,7 @@ export default function StepProblem() {
                     </p>
                     <input
                         {...register('audience', { required: true })}
-                        className="w-full bg-neutral-800 border border-neutral-700 rounded p-3 focus:ring-2 focus:ring-purple-500 outline-none"
+                        className="w-full bg-neutral-800 border border-neutral-700 rounded p-3 focus:ring-2 focus:ring-ps-blue outline-none"
                         placeholder="e.g. Remote creative agencies with 5-10 employees"
                     />
                 </div>
