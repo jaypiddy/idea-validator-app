@@ -32,7 +32,7 @@ export function Testimonials() {
                     className="text-center mb-12"
                 >
                     <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 mb-4">
-                        Trusted by founders who ship.
+                        Trusted by product leaders who ship.
                     </h2>
                     <p className="text-neutral-400 max-w-2xl mx-auto">
                         Don't just take our word for it. See how others are using data to build with confidence.

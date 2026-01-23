@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
@@ -10,9 +11,8 @@ import { Zap, Info, Eye, Ban, Map, Lock, Check, ArrowLeft } from 'lucide-react';
 
 export default function ReportPage() {
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [result, setResult] = useState<AnalysisResult | null>(null);
-    const [error, setError] = useState('');
+    // Data Fetching with SWR
+    const [ideaData, setIdeaData] = useState<string | null>(null);
 
     // Email Gating State
     const [email, setEmail] = useState('');
@@ -41,57 +41,47 @@ export default function ReportPage() {
         }
     }
 
+    // Initialize idea data on mount
     useEffect(() => {
-        async function fetchData() {
-            const dataStr = localStorage.getItem('ideaData');
-            if (!dataStr) {
-                router.push('/validate');
-                return;
-            }
+        const data = localStorage.getItem('ideaData');
+        if (!data) {
+            router.push('/validate');
+        } else {
+            setIdeaData(data);
+        }
+    }, [router]);
 
-            try {
-                // Check cache first
-                const cacheStr = localStorage.getItem('lastAnalysis');
-                if (cacheStr) {
-                    const cache = JSON.parse(cacheStr);
-                    // Compare current inputs (dataStr) with cached inputs
-                    // We simply compare the strings since they are both stringified JSON of the same shape
-                    if (cache.inputs === dataStr) {
-                        console.log("Using cached analysis result");
-                        setResult(cache.result);
-                        setLoading(false);
-                        return;
-                    }
+    const fetcher = async ([url, body]: [string, string]): Promise<AnalysisResult> => {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body,
+        });
+        if (!res.ok) throw new Error('Analysis failed');
+        return res.json();
+    };
+
+    const { data: result, error: swrError, isLoading } = useSWR<AnalysisResult>(
+        ideaData ? ['/api/analyze', ideaData] : null,
+        fetcher,
+        {
+            revalidateOnFocus: false,
+            shouldRetryOnError: false,
+            onSuccess: (data) => {
+                // Optional: Keep localStorage sync if needed for other parts of app, 
+                // otherwise SWR handles the session cache.
+                if (ideaData) {
+                    localStorage.setItem('lastAnalysis', JSON.stringify({
+                        inputs: ideaData,
+                        result: data
+                    }));
                 }
-
-                const data = JSON.parse(dataStr);
-                const res = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
-
-                if (!res.ok) throw new Error('Analysis failed');
-
-                const json = await res.json();
-                setResult(json);
-
-                // Save to cache
-                localStorage.setItem('lastAnalysis', JSON.stringify({
-                    inputs: dataStr,
-                    result: json
-                }));
-
-            } catch (err) {
-                console.error(err);
-                setError('Failed to analyze your idea. Please try again.');
-            } finally {
-                setLoading(false);
             }
         }
+    );
 
-        fetchData();
-    }, [router]);
+    const loading = isLoading;
+    const error = swrError ? 'Failed to analyze your idea. Please try again.' : '';
 
     if (loading) return <LoadingScreen />;
     if (error) return <div className="p-8 text-red-500 text-center">{error}</div>;
