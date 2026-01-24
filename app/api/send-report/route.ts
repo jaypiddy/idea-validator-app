@@ -152,7 +152,7 @@ function getRandomSubject(score: number) {
     const highScoreSubjects = [
         "Your MVP scored high. Don't ruin it with overbuilding.",
         "Your idea is execution-sensitive (Score inside)", // Include the winner here too
-        "65/100 is solid. Here’s what would break this MVP.",
+        `${score}/100 is solid. Here's what would break this MVP.`,
     ];
 
     const subjects = score > 80 ? highScoreSubjects : defaultSubjects;
