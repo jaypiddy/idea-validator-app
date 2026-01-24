@@ -79,7 +79,8 @@ export async function POST(req: Request) {
             "reason": "Short reason why they should proceed/pivot/pause based on tech feasibility."
         },
         "verdict": "A encouraging technical summary. Explain WHY it takes the estimated time based on the complexity.",
-        "unsaidRisk": "Identify one critical non-technical risk (e.g., trust signals, legal, distribution, adoption) that the score does not capture. Be specific to this idea."
+        "unsaidRisk": "Identify one critical non-technical risk (e.g., trust signals, legal, distribution, adoption) that the score does not capture. Be specific to this idea.",
+        "tradeoff": "A specific strategic sacrifice required to succeed (e.g., 'To hit the 6-week timeline, you must sacrifice the custom scheduling engine and use a third-party API instead.'). This replaces the generic advice."
       }
     `;
 

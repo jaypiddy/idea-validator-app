@@ -19,7 +19,7 @@ export function Button({
 
     const variants = {
         // Primary: Accent Blue + Glow Shadow
-        primary: "bg-ps-blue text-white hover:brightness-110 hover:shadow-[0_0_0_1px_rgba(0,96,255,0.5),0_20px_40px_rgba(0,96,255,0.20)] shadow-[0_0_0_1px_rgba(0,96,255,0.35),0_12px_36px_rgba(0,96,255,0.10)]",
+        primary: "bg-[#FD2E90] text-white hover:bg-[#FD2E90]/90 shadow-[0_0_20px_rgba(253,46,144,0.5)] hover:shadow-[0_0_30px_rgba(253,46,144,0.6)]",
         // Secondary: Transparent + Strong Border
         secondary: "bg-transparent text-[#F4F6FB] hover:bg-white/5 border border-[rgba(255,255,255,0.18)]",
         // Ghost: Subtle hover

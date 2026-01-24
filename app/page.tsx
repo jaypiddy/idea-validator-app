@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Rocket } from "lucide-react";
 import { Testimonials } from "@/components/Testimonials";
+import { FAQ } from "@/components/FAQ";
 import { HowItWorks } from "@/components/HowItWorks";
 
 export default function Home() {
@@ -58,7 +59,7 @@ export default function Home() {
               className="flex flex-col items-center justify-center pt-4 space-y-6"
             >
               <Link href="/validate">
-                <Button className="h-14 px-8 text-lg rounded-full bg-ps-blue hover:bg-ps-blue/90 shadow-[0_0_20px_rgba(0,96,255,0.5)] hover:shadow-[0_0_30px_rgba(0,96,255,0.6)] transition-all duration-300">
+                <Button className="h-14 px-8 text-lg rounded-full transition-all duration-300">
                   Validate my MVP
                 </Button>
               </Link>
@@ -77,50 +78,70 @@ export default function Home() {
         <HowItWorks />
 
         {/* Feature Grid Mini-Preview (Moved down/secondary now) */}
-        <div className="max-w-5xl px-4 w-full mt-12 mb-24">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl font-bold text-white mb-2">Detailed Analysis</h3>
-            <p className="text-neutral-400">Everything you need to make a go/no-go decision.</p>
-          </div>
+        <div className="max-w-5xl px-4 w-full mt-12 mb-0">
+          {/* Decision Close Section */}
+          <section id="decision-close" className="w-full max-w-5xl px-4 pt-24 pb-12 mx-auto text-center z-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative p-8 md:p-12 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden"
+            >
+              {/* Optional: Subtle gradient orb for effect */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
 
-          <motion.div
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={{
-              hidden: {},
-              show: {
-                transition: {
-                  staggerChildren: 0.15
-                }
-              }
-            }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left"
-          >
-            {[
-              { title: "Market Analysis", desc: "Identify competitors and differentiators instantly." },
-              { title: "Tech Validator", desc: "Get a reality check on build time and complexity." },
-              { title: "Execution Plan", desc: "Receive a step-by-step MVP roadmap." }
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
-                }}
-                className="p-6 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
-              >
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-neutral-400">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
+              <div className="relative z-10 space-y-8">
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-6">
+                  Before you build anything —<br />make the call that matters.
+                </h2>
 
-          <div className="mt-24 text-center border-t border-white/5 pt-12">
-            <p className="text-neutral-500 text-sm">
-              Created by Power Shifter Digital • Built from 20 years of shipping products.
-            </p>
-          </div>
+                <div className="max-w-3xl mx-auto space-y-6 text-lg md:text-xl text-neutral-300 font-light leading-relaxed">
+                  <p>
+                    Most MVPs fail for reasons that were visible early — overbuilt scope, underestimated complexity, or the wrong thing built first.
+                  </p>
+                  <p>
+                    This validator exists to surface those risks before they cost you months of time, burned capital, or a stalled product.
+                  </p>
+                  <p className="font-medium text-white">
+                    You don’t need more opinions. You need a clear execution signal.
+                  </p>
+                </div>
+
+                <div className="flex flex-col md:flex-row flex-wrap items-center justify-center gap-y-4 gap-x-8 md:gap-x-12 pt-6 pb-10">
+                  {[
+                    "20+ years shipping real products",
+                    "Trusted by product leaders",
+                    "Free & obligation-free"
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 text-base font-medium text-neutral-300 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+                      <div className="w-2 h-2 bg-ps-blue rounded-full shadow-[0_0_8px_rgba(0,96,255,0.6)]" />
+                      {item}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <Link href="/validate">
+                    <Button className="h-14 px-8 text-lg rounded-full transition-all duration-300">
+                      Validate my MVP now
+                    </Button>
+                  </Link>
+                  <div className="space-y-1">
+                    <p className="text-sm text-neutral-500 font-medium">
+                      Takes ~2 minutes · No credit card
+                    </p>
+                    <p className="text-xs text-neutral-600">
+                      Guessing feels faster. Validation is cheaper.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </section>
+
+          {/* FAQ Section */}
+          <FAQ />
         </div>
       </main>
     </div>

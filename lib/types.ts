@@ -28,6 +28,7 @@ export type AnalysisResult = {
     };
     verdict: string;
     unsaidRisk?: string; // New field for "Unsaid Risk" section
+    tradeoff?: string; // New field for "The Tradeoff" section
 };
 
 export type FormData = {

@@ -64,7 +64,7 @@ export async function POST(req: Request) {
                                 <h2 style="margin: 0 0 10px; font-size: 32px; color: #4F8CFF; font-weight: bold;">${report.score}/100 <span style="font-size: 16px; color: rgba(244,246,251,0.52); font-weight: normal;">Viability Score</span></h2>
                                 <p style="margin: 0; font-weight: 500; color: #F4F6FB;">The Tradeoff:</p>
                                 <p style="margin: 5px 0 0; color: rgba(244,246,251,0.72);">
-                                    This idea is not hard to build — it’s hard to <strong>sequence correctly</strong>. The fastest path to proof is a single financial integration, a narrow trust-first flow, and aggressive scope discipline. Anything beyond that before validation increases risk without increasing learning.
+                                    ${report.tradeoff || "This idea is not hard to build — it’s hard to sequence correctly. The fastest path to proof is a single financial integration, a narrow trust-first flow, and aggressive scope discipline. Anything beyond that before validation increases risk without increasing learning."}
                                 </p>
                             </div>
 
