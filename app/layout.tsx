@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "Power Shifter MVP Validator",
     images: [
       {
-        url: "/og-image.jpg", // Needs to be added to public/ or replaced with a real URL
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Power Shifter MVP Validator",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "MVP Validator | Pressure-test your idea before you build.",
     description: "Get a free, instant assessment of your MVP's market viability, technical complexity, and roadmap execution risks.",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.png"],
     creator: "@powershifter",
   },
   robots: {
