@@ -33,7 +33,7 @@ export async function POST(req: Request) {
         const resend = new Resend(apiKey);
 
         const { data, error } = await resend.emails.send({
-            from: 'Rapid MVP Validator <onboarding@resend.dev>', // Default for testing
+            from: process.env.RESEND_FROM_EMAIL || 'Rapid MVP Validator <onboarding@resend.dev>', // Use verified domain or default for testing
             to: [email],
             subject: getRandomSubject(report.score),
             html: `
