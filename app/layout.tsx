@@ -11,7 +11,7 @@ const rubik = Rubik({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mvp.powershifter.com"),
+  metadataBase: new URL("https://rapidmvp.powershifter.com"),
   title: {
     default: "MVP Validator | Power Shifter",
     template: "%s | Power Shifter MVP Validator",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://mvp.powershifter.com",
+    url: "https://rapidmvp.powershifter.com",
     title: "MVP Validator | Pressure-test your idea before you build.",
     description: "Get a free, instant assessment of your MVP's market viability, technical complexity, and roadmap execution risks.",
     siteName: "Power Shifter MVP Validator",

@@ -43,13 +43,21 @@ This is the easiest way to set up "Sync between Local and Cloud". Every time you
     -   Click **"Add variable"** for each key:
     -   **Name**: `GEMINI_API_KEY` | **Value**: (Paste your key)
     -   **Name**: `RESEND_API_KEY` | **Value**: (Paste your key)
+    -   **Name**: `RESEND_FROM_EMAIL` | **Value**: `Rapid MVP Validator <mvp.validator@mailupdates.powershifter.com>`
 10. Click **Create**.
 
-## Step 4: Adding Your Custom Domain (Optional)
-If you have a domain (e.g., `validate.justshift.it`):
-1.  Go to **Cloud Run > Manage Custom Domains**.
-2.  Click **Add Mapping**.
-3.  Select your service and follow the DNS instructions.
+## Step 4: Adding Your Custom Domain
+To map `rapidmvp.powershifter.com` to your Cloud Run service:
+
+1.  Go to the [Google Cloud Run Console](https://console.cloud.google.com/run).
+2.  Click **Manage Custom Domains** (top bar).
+3.  Click **Add Mapping**.
+4.  Select your service: `idea-validator-app`.
+5.  Select **"Verify a new domain"** (or select `powershifter.com` if already there).
+6.  Enter the subdomain: `rapidmvp.powershifter.com`.
+7.  Click **Continue**.
+8.  **Copy the DNS record** Google provides (it will be a Type `CNAME` or `A`, and a Value like `ghs.googlehosted.com`).
+9.  Go to your DNS Provider (AWS Route 53) and add that record.
 
 ## 🔄 How to Sync (Updates)
 Since we set up **Continuous Deployment**, "syncing" is now just `git push`.
