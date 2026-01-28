@@ -6,10 +6,14 @@ export async function POST(req: Request) {
         // 1. Origin Check (Simple CSRF/Abuse protection)
         const origin = req.headers.get('origin');
         const host = req.headers.get('host');
+
+        console.log('[API/Analyze] Request received. Origin:', origin, 'Host:', host);
+
         // Allow requests if they come from the same host (simple check)
         // In production, you might want to match against a specific env variable like process.env.NEXT_PUBLIC_URL
         if (origin && host && !origin.includes(host)) {
-            return NextResponse.json({ error: 'Forbidden: Invalid Origin' }, { status: 403 });
+            console.error('[API/Analyze] Origin mismatch. Origin:', origin, 'Host:', host);
+            return NextResponse.json({ error: `Forbidden: Invalid Origin (${origin} vs ${host})` }, { status: 403 });
         }
 
         const body = await req.json();
@@ -26,7 +30,7 @@ export async function POST(req: Request) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
         // 2. Prompt Hardening: XML Tags for clear separation
         const prompt = `
@@ -93,8 +97,11 @@ export async function POST(req: Request) {
 
         return NextResponse.json(JSON.parse(jsonStr));
 
-    } catch (error) {
-        console.error('AI Error:', error);
-        return NextResponse.json({ error: 'Failed to analyze idea' }, { status: 500 });
+    } catch (error: any) {
+        console.error('[API/Analyze] AI Error:', error);
+        return NextResponse.json({
+            error: error.message || 'Failed to analyze idea',
+            details: error.toString()
+        }, { status: 500 });
     }
 }

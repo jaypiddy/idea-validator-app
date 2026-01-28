@@ -63,7 +63,10 @@ export default function ReportPage() {
             headers: { 'Content-Type': 'application/json' },
             body: body,
         });
-        if (!res.ok) throw new Error('Analysis failed');
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Analysis failed');
+        }
         return res.json();
     };
 
@@ -87,7 +90,7 @@ export default function ReportPage() {
     );
 
     const loading = isLoading;
-    const error = swrError ? 'Failed to analyze your idea. Please try again.' : '';
+    const error = swrError ? swrError.message : '';
 
     const rapidWeeks = result ? Math.max(2, Math.ceil(result.monthsToBuild)) : 0;
 
