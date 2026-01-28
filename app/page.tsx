@@ -7,6 +7,7 @@ import { Rocket } from "lucide-react";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { HowItWorks } from "@/components/HowItWorks";
+import { FounderNote } from "@/components/FounderNote";
 
 export default function Home() {
   return (
@@ -76,6 +77,9 @@ export default function Home() {
 
         {/* How it Works */}
         <HowItWorks />
+
+        {/* Founder Note */}
+        <FounderNote />
 
         {/* Feature Grid Mini-Preview (Moved down/secondary now) */}
         <div className="max-w-5xl px-4 w-full mt-12 mb-0">
