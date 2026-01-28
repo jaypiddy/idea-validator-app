@@ -16,7 +16,7 @@ export function FounderNote() {
                         <div className="relative w-48 h-48 md:w-56 md:h-56 overflow-hidden rounded-2xl border-2 border-white/10 shadow-2xl rotate-3 transition-transform duration-500 group-hover:rotate-0">
                             <Image
                                 src="/jay-founder.jpg"
-                                alt="Jay Holecka"
+                                alt="JP Holecka"
                                 fill
                                 className="object-cover"
                                 sizes="(max-width: 768px) 192px, 224px"
@@ -46,7 +46,7 @@ export function FounderNote() {
 
                         <div className="pt-2 flex flex-col md:flex-row items-center gap-4">
                             <div className="text-left">
-                                <div className="text-white font-semibold text-lg">Jay Holecka</div>
+                                <div className="text-white font-semibold text-lg">JP Holecka</div>
                                 <div className="text-ps-blue text-sm font-medium">Founder & CEO</div>
                             </div>
                         </div>
