@@ -33,7 +33,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="text-[10px] text-neutral-800 font-mono mt-2">
-                    v1.5-flash / Build: {new Date().toISOString().split('T')[0]}
+                    v2.0-flash / Build: {new Date().toISOString().split('T')[0]}
                 </div>
             </div>
         </footer>

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@next/third-parties": "^14.1.0",
     "canvas-confetti": "^1.9.4",
     "framer-motion": "^12.28.1",
     "lucide-react": "^0.562.0",
