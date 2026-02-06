@@ -11,6 +11,12 @@ import confetti from 'canvas-confetti';
 
 import { Zap, Info, Eye, Ban, Map, Lock, Check, ArrowLeft } from 'lucide-react';
 
+declare global {
+    interface Window {
+        lintrk: (action: string, data: { conversion_id: number }) => void;
+    }
+}
+
 export default function ReportPage() {
     const router = useRouter();
     // Data Fetching with SWR
@@ -35,6 +41,11 @@ export default function ReportPage() {
             if (!res.ok) {
                 const errorData = await res.json();
                 throw new Error(errorData.error || 'Failed to send email');
+            }
+
+            // Track conversion
+            if (window.lintrk) {
+                window.lintrk('track', { conversion_id: 23909916 });
             }
 
             setEmailSent(true);
