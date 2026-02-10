@@ -1,10 +1,64 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
+// Campaign Monitor Integration
+async function addSubscriber(email: string, name: string, inputs: any) {
+    const apiKey = process.env.CAMPAIGN_MONITOR_API_KEY;
+    const listId = process.env.CAMPAIGN_MONITOR_LIST_ID;
+
+    if (!apiKey || !listId) {
+        console.warn('Campaign Monitor API Key or List ID not set');
+        return;
+    }
+
+    const customFields = [
+        { Key: '[Whatspecificproblemareyousolving?]', Value: inputs.problem },
+        { Key: '[Whathappensifthisproblemremainsunsolvedfor12months?]', Value: inputs.problem_impact },
+        { Key: '[Whoisexperiencingthispainmostacutely?]', Value: inputs.audience },
+        { Key: '[Describeyoursolutioninonesentence.]', Value: inputs.solution },
+        { Key: '[WhatpartofthissolutionMUSTworkfortheideatosurvive?]', Value: inputs.solution_critical_path },
+        { Key: '[KeyfeaturesfortheMVP?]', Value: inputs.features },
+        { Key: '[ExistingCompetitors]', Value: inputs.competitors },
+        { Key: '[Whatbehaviormustchangeforthistosucceed?]', Value: inputs.market_behavior_change },
+        { Key: '[Whywilltheyswitchtoyou?]', Value: inputs.market },
+        { Key: '[EstimatedTimeline]', Value: inputs.timeline },
+        { Key: '[RoughBudget]', Value: inputs.budget },
+        { Key: '[Whowouldownthisinternallyafterlaunch?]', Value: inputs.execution_owner },
+    ].filter(field => field.Value); // Only send defined values
+
+    try {
+        const auth = Buffer.from(`${apiKey}:x`).toString('base64');
+        const res = await fetch(`https://api.createsend.com/api/v3.3/subscribers/${listId}.json`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                EmailAddress: email,
+                Name: name,
+                CustomFields: customFields,
+                Resubscribe: true,
+                RestartSubscriptionBasedAutoresponders: true,
+                ConsentToTrack: "Yes"
+            })
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('Campaign Monitor Error:', errorText);
+        } else {
+            console.log(`Successfully added ${email} to Campaign Monitor`);
+        }
+    } catch (error) {
+        console.error('Failed to add subscriber to Campaign Monitor:', error);
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { email, report } = body;
+        const { name, email, report, inputs } = body;
 
         if (!email || !report) {
             return NextResponse.json({ error: 'Missing email or report data' }, { status: 400 });
@@ -16,12 +70,15 @@ export async function POST(req: Request) {
         if (!apiKey) {
             console.log('--- SIMULATING EMAIL SEND ---');
             console.log(`To: ${email}`);
+            console.log(`Name: ${name}`);
             console.log('Subject: Your Rapid MVP Validation Report');
             console.log('Content Summary:', {
                 score: report.score,
                 killList: report.killList,
                 roadmap: report.timelineNarrative
             });
+            console.log('--- SIMULATING CAMPAIGN MONITOR ---');
+            console.log('Inputs to sync:', inputs ? Object.keys(inputs).length : 0);
             console.log('-----------------------------');
 
             // Artificial delay to simulate network request
@@ -32,8 +89,13 @@ export async function POST(req: Request) {
 
         const resend = new Resend(apiKey);
 
-        const { data, error } = await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL || 'Rapid MVP Validator <onboarding@resend.dev>', // Use verified domain or default for testing
+        // Execute both logically in parallel
+        // We await Email because it's the critical path for "Report Sent" UI
+        // We don't necessarily need to block on CM, but it's good to know if it failed.
+        // For now, we'll await both but catch CM errors so they don't block the response.
+
+        const emailPromise = resend.emails.send({
+            from: process.env.RESEND_FROM_EMAIL || 'Rapid MVP Validator <mvp.validator@mailupdates.powershifter.com>',
             to: [email],
             subject: getRandomSubject(report.score),
             html: `
@@ -45,11 +107,12 @@ export async function POST(req: Request) {
                             <!-- Header -->
                             <div style="padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.10); margin-bottom: 30px;">
                                 <h1 style="color: #4F8CFF; margin: 0; font-size: 24px; font-weight: bold; letter-spacing: -0.02em;">POWER SHIFTER Digital's Rapid MVP Analysis</h1>
-                                <p style="margin: 5px 0 0; color: rgba(244,246,251,0.72); font-size: 14px;">Assessment for ${email}</p>
+                                <p style="margin: 5px 0 0; color: rgba(244,246,251,0.72); font-size: 14px;">Assessment for ${name || email}</p>
                             </div>
 
                             <!-- Intro -->
                             <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.10);">
+                                <p style="margin-bottom: 15px; color: #F4F6FB;">Hi ${name || 'there'},</p>
                                 <p style="margin-bottom: 15px; color: #F4F6FB;">Thank you for sharing your MVP idea with us. Before diving in, a quick note on trust: <strong>your idea remains yours.</strong> We do not claim ownership of submissions, reuse them, or treat validator inputs as our IP.</p>
                                 <p style="margin-bottom: 0; color: #F4F6FB;">For nearly two decades, we’ve helped teams design, build, and ship digital products across industries. This analysis reflects how we think about MVPs in practice — not as feature-heavy builds, but as focused tools for validating assumptions, sequencing risk, and learning what deserves further investment.</p>
                             </div>
@@ -118,6 +181,14 @@ export async function POST(req: Request) {
                                     <img src="https://storage.googleapis.com/jp-images-for-apps/MVP%20Validator/SignatureTransparent-white.png" alt="Signature" style="height: 40px; display: block; margin-bottom: 10px;" />
                                     <p style="margin: 0; font-weight: bold;">JP Holecka // CEO/Founder</p>
                                 </div>
+                                
+                                <!-- Unsubscribe Footer -->
+                                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.10); font-size: 12px; color: rgba(244,246,251,0.4);">
+                                    <p style="margin: 0;">
+                                        You received this email because you used the Rapid MVP Validator. 
+                                        <a href="${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?email=${encodeURIComponent(email)}" style="color: rgba(244,246,251,0.6); text-decoration: underline;">Unsubscribe</a>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -125,6 +196,14 @@ export async function POST(req: Request) {
             </html>
             `,
         });
+
+        // Add to Campaign Monitor (Fire and forget-ish, but await to log errors)
+        if (inputs) {
+            // We await it so the logs appear in Vercel/console before the lambda spins down
+            await addSubscriber(email, name, inputs);
+        }
+
+        const { data, error } = await emailPromise;
 
         if (error) {
             console.error('Resend Error:', error);

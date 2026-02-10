@@ -23,6 +23,7 @@ export default function ReportPage() {
     const [ideaData, setIdeaData] = useState<string | null>(null);
 
     // Email Gating State
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [sendingEmail, setSendingEmail] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
@@ -32,10 +33,19 @@ export default function ReportPage() {
         setSendingEmail(true);
 
         try {
+            let inputs = {};
+            try {
+                if (ideaData) {
+                    inputs = JSON.parse(ideaData);
+                }
+            } catch (e) {
+                console.error("Failed to parse ideaData for submission", e);
+            }
+
             const res = await fetch('/api/send-report', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, report: result }),
+                body: JSON.stringify({ name, email, report: result, inputs }),
             });
 
             if (!res.ok) {
@@ -333,15 +343,26 @@ export default function ReportPage() {
                                 </div>
 
                                 <form className="space-y-3" onSubmit={handleEmailSubmit}>
-                                    <input
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full bg-black border border-neutral-700 rounded-xl p-4 text-center focus:ring-2 focus:ring-ps-blue outline-none text-white placeholder:text-neutral-600"
-                                        required
-                                        disabled={sendingEmail}
-                                    />
+                                    <div className="space-y-3">
+                                        <input
+                                            type="text"
+                                            placeholder="Your Name"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="w-full bg-black border border-neutral-700 rounded-xl p-4 text-center focus:ring-2 focus:ring-ps-blue outline-none text-white placeholder:text-neutral-600"
+                                            required
+                                            disabled={sendingEmail}
+                                        />
+                                        <input
+                                            type="email"
+                                            placeholder="Enter your email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full bg-black border border-neutral-700 rounded-xl p-4 text-center focus:ring-2 focus:ring-ps-blue outline-none text-white placeholder:text-neutral-600"
+                                            required
+                                            disabled={sendingEmail}
+                                        />
+                                    </div>
                                     <button
                                         type="submit"
                                         disabled={sendingEmail}
