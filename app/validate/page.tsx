@@ -4,9 +4,13 @@ import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import WizardLayout from '@/components/wizard/WizardLayout';
+import StepIntro from '@/components/wizard/StepIntro';
+import StepType from '@/components/wizard/StepType';
 import StepProblem from '@/components/wizard/StepProblem';
+import StepProblemInternal from '@/components/wizard/StepProblemInternal';
 import StepSolution from '@/components/wizard/StepSolution';
-import StepMarket from '@/components/wizard/StepMarket';
+import StepPositioning from '@/components/wizard/StepPositioning';
+import StepSystems from '@/components/wizard/StepSystems';
 import StepExecution from '@/components/wizard/StepExecution';
 import { FormData } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,9 +18,17 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Card } from '@/components/ui/Card';
 
-import StepIntro from '@/components/wizard/StepIntro';
+// Each flow is intro + type picker + 4 content steps. Only the 4 content
+// steps differ between go-to-market and internal builds.
+const gtmFlow = [StepProblem, StepSolution, StepPositioning, StepExecution];
+const internalFlow = [StepProblemInternal, StepSolution, StepSystems, StepExecution];
+const CONTENT_STEPS = 4;
 
-const steps = [StepIntro, StepProblem, StepSolution, StepMarket, StepExecution];
+function buildSteps(projectType: string | undefined) {
+    if (projectType === 'internal') return [StepIntro, StepType, ...internalFlow];
+    if (projectType === 'gtm') return [StepIntro, StepType, ...gtmFlow];
+    return [StepIntro, StepType]; // before a type is chosen
+}
 
 export default function ValidatePage() {
     const [currentStep, setCurrentStep] = useState(0);
@@ -40,32 +52,46 @@ export default function ValidatePage() {
         }
     }, [methods]);
 
+    const projectType = methods.watch('projectType');
+    const steps = buildSteps(projectType);
     const CurrentStepComponent = steps[currentStep];
-    const totalSteps = steps.length - 1;
-    const pct = Math.round((currentStep / totalSteps) * 100);
-    const isLastStep = currentStep === steps.length - 1;
+    // Only a chosen flow can have a "last" step — guards the type picker (step 1)
+    // from showing the Analyze label before a project type is selected.
+    const isLastStep = Boolean(projectType) && currentStep === steps.length - 1;
+
+    // Progress only covers the 4 content steps (intro + type picker are setup).
+    const showProgress = currentStep >= 2;
+    const contentStep = currentStep - 1; // step 2 => 1 ... step 5 => 4
+    const pct = Math.round((contentStep / CONTENT_STEPS) * 100);
 
     const handleNext = async () => {
-        // Don't validate form on intro step
-        const valid = currentStep === 0 ? true : await methods.trigger();
+        // Intro has no fields to validate.
+        if (currentStep === 0) {
+            window.scrollTo(0, 0);
+            setCurrentStep(1);
+            return;
+        }
 
-        if (valid) {
-            if (isLastStep) {
-                const currentData = methods.getValues();
+        // Validate the fields rendered so far (incl. the required project type).
+        const valid = await methods.trigger();
+        if (!valid) return;
 
-                // Compare with initial data
-                if (initialData && JSON.stringify(currentData) === JSON.stringify(initialData)) {
-                    setShowNoChangesModal(true);
-                    return;
-                }
+        // Recompute the flow from the freshly-validated value to avoid stale state.
+        const pt = methods.getValues('projectType');
+        const effectiveSteps = buildSteps(pt);
+        const atLastStep = currentStep >= effectiveSteps.length - 1;
 
-                // If changed (or new), save and proceed
-                localStorage.setItem('ideaData', JSON.stringify(currentData));
-                router.push('/report');
-            } else {
-                window.scrollTo(0, 0);
-                setCurrentStep((prev) => prev + 1);
+        if (atLastStep) {
+            const currentData = methods.getValues();
+            if (initialData && JSON.stringify(currentData) === JSON.stringify(initialData)) {
+                setShowNoChangesModal(true);
+                return;
             }
+            localStorage.setItem('ideaData', JSON.stringify(currentData));
+            router.push('/report');
+        } else {
+            window.scrollTo(0, 0);
+            setCurrentStep((prev) => prev + 1);
         }
     };
 
@@ -82,18 +108,18 @@ export default function ValidatePage() {
                     <span className="eyebrow">Power Shifter · MVP Validator</span>
                 </div>
 
-                {/* Progress (hidden on intro) */}
-                {currentStep > 0 && (
+                {/* Progress (content steps only) */}
+                {showProgress && (
                     <div className="wiz-progress">
                         <div className="wiz-progress-top">
-                            <span>Step {currentStep} of {totalSteps}</span>
+                            <span>Step {contentStep} of {CONTENT_STEPS}</span>
                             <span>{pct}%</span>
                         </div>
                         <div className="wiz-track">
                             <motion.div
                                 className="wiz-fill"
                                 initial={{ scaleX: 0 }}
-                                animate={{ scaleX: currentStep / totalSteps }}
+                                animate={{ scaleX: contentStep / CONTENT_STEPS }}
                                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                             />
                         </div>
