@@ -147,7 +147,7 @@ export default function ReportPage() {
     if (!result) return null;
 
     return (
-        <div className="min-h-screen p-6 md:p-12 relative overflow-x-hidden">
+        <div className="min-h-screen p-6 md:p-12 relative overflow-x-hidden bg-[#121315] text-[#F4F6FB]">
             <button
                 onClick={() => router.push('/validate')}
                 className="fixed top-6 left-6 text-sm text-neutral-400 hover:text-white flex items-center gap-2 transition-colors z-50 bg-neutral-900/50 backdrop-blur px-4 py-2 rounded-full border border-neutral-800"

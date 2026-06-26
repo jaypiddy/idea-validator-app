@@ -1,10 +1,4 @@
-'use client';
-
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
 
 const faqs = [
     {
@@ -46,70 +40,37 @@ const faqs = [
 ];
 
 export function FAQ() {
-    const [openIndex, setOpenIndex] = useState<number | null>(0);
-
     return (
-        <section id="mvp-faq" className="w-full py-24 md:py-32 px-4 relative z-10 bg-[#0B0D12]">
-            <div className="max-w-3xl mx-auto">
-                <div className="text-center mb-16 space-y-4">
-                    <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
-                        Common questions before building an MVP
-                    </h2>
-                    <p className="text-lg text-neutral-400 font-light">
+        <section id="mvp-faq" className="rm-section rm-light rm-bordered">
+            <div className="wrap">
+                <div className="rm-head center">
+                    <span className="eyebrow pink">FAQ</span>
+                    <h2 className="rm-h2">Common questions before building an MVP</h2>
+                    <p className="rm-lead">
                         Everything you should pressure-test before committing time, budget, or a team.
                     </p>
                 </div>
 
-                <div className="space-y-4">
-                    {faqs.map((faq, index) => {
-                        const isOpen = openIndex === index;
-                        return (
-                            <div key={index} className="border-b border-white/5 last:border-none">
-                                <button
-                                    onClick={() => setOpenIndex(isOpen ? null : index)}
-                                    className="w-full flex items-center justify-between py-6 text-left group"
-                                    aria-expanded={isOpen}
-                                >
-                                    <span className={`text-lg md:text-xl font-medium transition-colors duration-200 ${isOpen ? 'text-white' : 'text-neutral-300 group-hover:text-white'}`}>
-                                        {faq.question}
-                                    </span>
-                                    <span className={`ml-4 flex-shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                                        <ChevronDown className={`w-5 h-5 ${isOpen ? 'text-ps-blue' : 'text-neutral-500'}`} />
-                                    </span>
-                                </button>
-                                <AnimatePresence initial={false}>
-                                    {isOpen && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: "auto", opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            transition={{ duration: 0.3, ease: "easeInOut" }}
-                                            className="overflow-hidden"
-                                        >
-                                            <p className="pb-8 text-neutral-400 leading-relaxed text-base md:text-lg font-light">
-                                                {faq.answer}
-                                            </p>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        );
-                    })}
-                </div>
+                <div className="rm-faqwrap">
+                    <div className="rm-faq">
+                        {faqs.map((faq, index) => (
+                            <details key={index} open={index === 0}>
+                                <summary>
+                                    {faq.question}
+                                    <span className="chev" />
+                                </summary>
+                                <p>{faq.answer}</p>
+                            </details>
+                        ))}
+                    </div>
 
-                <div className="mt-20 flex flex-col items-center justify-center space-y-4">
-                    <Link href="/validate">
-                        <Button className="h-14 px-8 text-lg rounded-full transition-all duration-300">
-                            Validate my MVP now
-                        </Button>
-                    </Link>
-                    <div className="space-y-1 text-center">
-                        <p className="text-sm text-neutral-500 font-medium">
-                            Takes ~2 minutes · No credit card
-                        </p>
+                    <div className="rm-cta-center">
+                        <Link href="/validate" className="btn solid">Validate my MVP now →</Link>
+                        <span className="rm-note dark">Takes ~2 minutes · No credit card</span>
                     </div>
                 </div>
             </div>
+
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
