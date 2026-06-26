@@ -89,104 +89,124 @@ export async function POST(req: Request) {
 
         const resend = new Resend(apiKey);
 
-        // Execute both logically in parallel
-        // We await Email because it's the critical path for "Report Sent" UI
-        // We don't necessarily need to block on CM, but it's good to know if it failed.
-        // For now, we'll await both but catch CM errors so they don't block the response.
+        // --- Power Shifter brand tokens (email-safe) ---
+        // Web fonts via Typekit are progressive enhancement; the stacks fall
+        // back gracefully in clients that strip them (Gmail, Outlook).
+        const DISPLAY = `'articulat-heavy-cf', 'Helvetica Neue', Helvetica, Arial, sans-serif`;
+        const SANS = `'articulat-cf', 'Helvetica Neue', Helvetica, Arial, sans-serif`;
+        const SERIF = `'fraunces-variable', Georgia, 'Times New Roman', serif`;
+        const MONO = `'config-mono-vf', ui-monospace, 'SF Mono', Menlo, monospace`;
+        const INK = '#121315';
+        const CARD = '#1A1B1E';
+        const PAPER = '#FAFAF7';
+        const MAGENTA = '#FD2E90';
+        const LINE = 'rgba(250,250,247,0.14)';
+        const MUTE = 'rgba(250,250,247,0.72)';
+        const FAINT = 'rgba(250,250,247,0.5)';
+        const kicker = `font-family:${MONO}; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:${MAGENTA}; margin:0 0 8px;`;
 
         const emailPromise = resend.emails.send({
             from: process.env.RESEND_FROM_EMAIL || 'Rapid MVP Validator <mvp.validator@mailupdates.powershifter.com>',
             to: [email],
             subject: getRandomSubject(report.score),
             html: `
-                <html style="background-color: #0B0D12;">
-                <body style="background-color: #0B0D12; margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                    <div style="background-color: #0B0D12; color: #F4F6FB; line-height: 1.6; padding: 40px 20px;">
-                        
-                        <div style="max-width: 600px; margin: 0 auto;">
+                <html style="background-color:${INK};">
+                <head>
+                    <meta name="color-scheme" content="dark">
+                    <meta name="supported-color-schemes" content="dark">
+                    <link rel="stylesheet" href="https://use.typekit.net/xkk7api.css">
+                </head>
+                <body style="background-color:${INK}; margin:0; padding:0; font-family:${SANS};">
+                    <div style="background-color:${INK}; color:${PAPER}; line-height:1.6; padding:40px 20px;">
+
+                        <div style="max-width:600px; margin:0 auto;">
                             <!-- Header -->
-                            <div style="padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.10); margin-bottom: 30px;">
-                                <h1 style="color: #4F8CFF; margin: 0; font-size: 24px; font-weight: bold; letter-spacing: -0.02em;">POWER SHIFTER Digital's Rapid MVP Analysis</h1>
-                                <p style="margin: 5px 0 0; color: rgba(244,246,251,0.72); font-size: 14px;">Assessment for ${name || email}</p>
+                            <div style="padding-bottom:22px; border-bottom:1px solid ${LINE}; margin-bottom:30px;">
+                                <p style="${kicker}">Power Shifter &middot; MVP Validator</p>
+                                <h1 style="color:${PAPER}; margin:0; font-family:${DISPLAY}; font-size:28px; font-weight:800; letter-spacing:-0.02em; line-height:1.1;">Rapid MVP Analysis</h1>
+                                <p style="margin:10px 0 0; font-family:${MONO}; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:${FAINT};">Assessment for ${name || email}</p>
                             </div>
 
                             <!-- Intro -->
-                            <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.10);">
-                                <p style="margin-bottom: 15px; color: #F4F6FB;">Hi ${name || 'there'},</p>
-                                <p style="margin-bottom: 15px; color: #F4F6FB;">Thank you for sharing your MVP idea with us. Before diving in, a quick note on trust: <strong>your idea remains yours.</strong> We do not claim ownership of submissions, reuse them, or treat validator inputs as our IP.</p>
-                                <p style="margin-bottom: 0; color: #F4F6FB;">For nearly two decades, we’ve helped teams design, build, and ship digital products across industries. This analysis reflects how we think about MVPs in practice — not as feature-heavy builds, but as focused tools for validating assumptions, sequencing risk, and learning what deserves further investment.</p>
+                            <div style="margin-bottom:30px; padding-bottom:24px; border-bottom:1px solid ${LINE};">
+                                <p style="margin:0 0 15px; color:${PAPER};">Hi ${name || 'there'},</p>
+                                <p style="margin:0 0 15px; color:${MUTE};">Thank you for sharing your MVP idea with us. Before diving in, a quick note on trust: <strong style="color:${PAPER};">your idea remains yours.</strong> We do not claim ownership of submissions, reuse them, or treat validator inputs as our IP.</p>
+                                <p style="margin:0; color:${MUTE};">For nearly two decades, we&rsquo;ve helped teams design, build, and ship digital products across industries. This analysis reflects how we think about MVPs in practice &mdash; not as feature-heavy builds, but as focused tools for validating assumptions, sequencing risk, and learning what deserves further investment.</p>
                             </div>
 
                             <!-- Hook -->
-                            <p style="font-size: 18px; margin-bottom: 30px; color: #F4F6FB;">
-                                Based on what you shared, your idea is <strong>viable — but it is execution-sensitive.</strong>
+                            <p style="font-family:${DISPLAY}; font-weight:800; font-size:22px; line-height:1.3; letter-spacing:-0.01em; margin:0 0 30px; color:${PAPER};">
+                                Based on what you shared, your idea is <span style="color:${MAGENTA};">viable &mdash; but it is execution-sensitive.</span>
                             </p>
 
                             <!-- Score & Tradeoff -->
-                            <div style="background: rgba(16,20,33,1); padding: 25px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.10); margin-bottom: 35px;">
-                                <h2 style="margin: 0 0 10px; font-size: 32px; color: #4F8CFF; font-weight: bold;">${report.score}/100 <span style="font-size: 16px; color: rgba(244,246,251,0.52); font-weight: normal;">Viability Score</span></h2>
-                                <p style="margin: 0; font-weight: 500; color: #F4F6FB;">The Tradeoff:</p>
-                                <p style="margin: 5px 0 0; color: rgba(244,246,251,0.72);">
-                                    ${report.tradeoff || "This idea is not hard to build — it’s hard to sequence correctly. The fastest path to proof is a single financial integration, a narrow trust-first flow, and aggressive scope discipline. Anything beyond that before validation increases risk without increasing learning."}
+                            <div style="background:${CARD}; padding:28px; border:1px solid ${LINE}; margin-bottom:35px;">
+                                <div style="font-family:${DISPLAY}; font-weight:800; font-size:48px; line-height:1; letter-spacing:-0.03em; color:${MAGENTA}; margin-bottom:14px;">${report.score}<span style="font-size:18px; color:${FAINT}; font-weight:400;">/100</span> &nbsp;<span style="font-family:${MONO}; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:${FAINT};">Viability Score</span></div>
+                                <p style="${kicker}">The Tradeoff</p>
+                                <p style="margin:0; color:${MUTE};">
+                                    ${report.tradeoff || "This idea is not hard to build — it&rsquo;s hard to sequence correctly. The fastest path to proof is a single financial integration, a narrow trust-first flow, and aggressive scope discipline. Anything beyond that before validation increases risk without increasing learning."}
                                 </p>
                             </div>
 
-                            <!-- The Scope Kill List -->
-                            <h3 style="color: #FF4D5A; font-size: 18px; margin-top: 0;">🛑 The Hard Decisions</h3>
-                            <p style="margin-bottom: 15px; color: #F4F6FB;">If we were responsible for this MVP, these are the things we would <strong>explicitly refuse to build</strong> in Phase 1 to ensure you actually launch:</p>
-                            <ul style="background: rgba(255,77,90,0.10); border: 1px solid rgba(255,77,90,0.25); border-radius: 14px; padding: 20px 20px 20px 40px; margin-bottom: 35px;">
-                                ${report.killList.map((item: string) => `<li style="margin-bottom: 8px; color: #FF4D5A;">${item}</li>`).join('')}
-                            </ul>
+                            <!-- The Hard Decisions -->
+                            <p style="${kicker}">The Hard Decisions</p>
+                            <p style="margin:0 0 15px; color:${MUTE};">If we were responsible for this MVP, these are the things we would <strong style="color:${PAPER};">explicitly refuse to build</strong> in Phase 1 to ensure you actually launch:</p>
+                            <div style="background:${CARD}; border:1px solid ${LINE}; border-left:3px solid ${MAGENTA}; padding:20px 24px; margin-bottom:35px;">
+                                <ul style="margin:0; padding-left:18px;">
+                                    ${report.killList.map((item: string) => `<li style="margin-bottom:10px; color:${PAPER};">${item}</li>`).join('')}
+                                </ul>
+                            </div>
 
-                            <!-- The Unsaid Risk (New Section) -->
+                            <!-- The Unsaid Risk -->
                             ${report.unsaidRisk ? `
-                            <h3 style="color: #FFB020; font-size: 18px;">⚠️ The Unsaid Risk</h3>
-                            <p style="margin-bottom: 10px; color: #F4F6FB;">Scores don't capture everything. Based on the complexity pattern of your answers, here is the one non-technical risk that could kill this venture:</p>
-                            <blockquote style="border-left: 4px solid #FFB020; padding-left: 15px; margin: 0 0 35px; color: rgba(244,246,251,0.72); font-style: italic;">
-                                "${report.unsaidRisk}"
+                            <p style="${kicker}">The Unsaid Risk</p>
+                            <p style="margin:0 0 12px; color:${MUTE};">Scores don&rsquo;t capture everything. Based on the complexity pattern of your answers, here is the one non-technical risk that could kill this venture:</p>
+                            <blockquote style="border-left:3px solid ${MAGENTA}; padding-left:20px; margin:0 0 35px; color:${PAPER}; font-family:${SERIF}; font-style:italic; font-size:20px; line-height:1.4;">
+                                &ldquo;${report.unsaidRisk}&rdquo;
                             </blockquote>
                             ` : ''}
 
-                            <!-- 6-Week Plan / Paths -->
-                            <h3 style="color: #F4F6FB; font-size: 18px;">🗺️ Two Paths Forward</h3>
-                            <p style="color: #F4F6FB;">You have a choice on how to execute this:</p>
-                            
-                            <div style="display: flex; margin-bottom: 35px;">
-                                <div style="flex: 1; padding: 15px; background: rgba(16,20,33,1); border: 1px solid rgba(255,255,255,0.10); border-radius: 14px;">
-                                    <strong style="display: block; color: rgba(244,246,251,0.52); font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">Path A: Traditional Build</strong>
-                                    <div style="font-size: 24px; font-weight: bold; color: rgba(244,246,251,0.72); margin-bottom: 5px;">${report.monthsToBuild} Months</div>
-                                    <div style="font-size: 13px; color: rgba(244,246,251,0.52);">High burn. Slow feedback loop. You’ll learn if this works <em>after</em> most of the cost is sunk.</div>
-                                </div>
-                                <!-- Spacer for email compatibility -->
-                                <div style="width: 10px; min-width: 10px;"></div>
-                                <div style="flex: 1; padding: 15px; background: rgba(79,140,255,0.10); border: 1px solid rgba(79,140,255,0.25); border-radius: 14px;">
-                                    <strong style="display: block; color: #4F8CFF; font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">Path B: Rapid MVP</strong>
-                                    <div style="font-size: 24px; font-weight: bold; color: #4F8CFF; margin-bottom: 5px;">6 Weeks</div>
-                                    <div style="font-size: 13px; color: #4F8CFF;">Aggressive scope cuts. Faster truth. You’ll know early whether this deserves more investment — or a pivot.</div>
-                                </div>
-                            </div>
+                            <!-- Two Paths Forward -->
+                            <p style="${kicker}">Two Paths Forward</p>
+                            <p style="margin:0 0 16px; color:${MUTE};">You have a choice on how to execute this:</p>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:35px; border-collapse:separate;">
+                                <tr>
+                                    <td valign="top" width="48%" style="background:${CARD}; border:1px solid ${LINE}; padding:20px;">
+                                        <div style="font-family:${MONO}; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:${FAINT}; margin-bottom:8px;">Path A &middot; Traditional Build</div>
+                                        <div style="font-family:${DISPLAY}; font-size:28px; font-weight:800; letter-spacing:-0.02em; color:${PAPER}; margin-bottom:8px;">${report.monthsToBuild} Months</div>
+                                        <div style="font-size:13px; line-height:1.5; color:${FAINT};">High burn. Slow feedback loop. You&rsquo;ll learn if this works <em>after</em> most of the cost is sunk.</div>
+                                    </td>
+                                    <td width="4%">&nbsp;</td>
+                                    <td valign="top" width="48%" style="background:${CARD}; border:1px solid ${MAGENTA}; padding:20px;">
+                                        <div style="font-family:${MONO}; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:${MAGENTA}; margin-bottom:8px;">Path B &middot; Rapid MVP</div>
+                                        <div style="font-family:${DISPLAY}; font-size:28px; font-weight:800; letter-spacing:-0.02em; color:${PAPER}; margin-bottom:8px;">6 Weeks</div>
+                                        <div style="font-size:13px; line-height:1.5; color:${MUTE};">Aggressive scope cuts. Faster truth. You&rsquo;ll know early whether this deserves more investment &mdash; or a pivot.</div>
+                                    </td>
+                                </tr>
+                            </table>
 
                             <!-- CTA -->
-                            <div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.10);">
-                                <p style="font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #F4F6FB;">Want a second opinion on the MVP idea or the exact scope?</p>
-                                
-                                <a href="https://justshift.it/meeting-with-jp" style="display: inline-block; background: #4F8CFF; color: #F4F6FB; text-decoration: none; padding: 12px 24px; border-radius: 9999px; font-weight: bold; margin-bottom: 30px;">Book your free, no obligation discovery call today</a>
+                            <div style="margin-top:50px; padding-top:30px; border-top:1px solid ${LINE};">
+                                <p style="font-family:${DISPLAY}; font-size:18px; font-weight:800; letter-spacing:-0.01em; margin:0 0 18px; color:${PAPER};">Want a second opinion on the MVP idea or the exact scope?</p>
 
-                                <p style="font-size: 14px; color: rgba(244,246,251,0.52); margin-bottom: 20px; font-style: italic;">
-                                    "Most teams stall at this point. The ones that move forward usually do so by making one uncomfortable scope decision early."
+                                <a href="https://justshift.it/meeting-with-jp" style="display:inline-block; background:${PAPER}; color:${INK}; text-decoration:none; padding:14px 26px; font-family:${SANS}; font-weight:700; letter-spacing:0.02em; margin-bottom:30px;">Book your free, no-obligation discovery call &rarr;</a>
+
+                                <p style="font-family:${SERIF}; font-style:italic; font-size:16px; color:${MUTE}; margin:0 0 20px;">
+                                    &ldquo;Most teams stall at this point. The ones that move forward usually do so by making one uncomfortable scope decision early.&rdquo;
                                 </p>
 
-                                <div style="margin-top: 40px; color: #F4F6FB;">
-                                    <p style="margin-bottom: 10px;">Sincerely,</p>
-                                    <img src="https://storage.googleapis.com/jp-images-for-apps/MVP%20Validator/SignatureTransparent-white.png" alt="Signature" style="height: 40px; display: block; margin-bottom: 10px;" />
-                                    <p style="margin: 0; font-weight: bold;">JP Holecka // CEO/Founder</p>
+                                <div style="margin-top:40px; color:${PAPER};">
+                                    <p style="margin:0 0 10px;">Sincerely,</p>
+                                    <img src="https://storage.googleapis.com/jp-images-for-apps/MVP%20Validator/SignatureTransparent-white.png" alt="Signature" style="height:40px; display:block; margin-bottom:10px;" />
+                                    <p style="margin:0; font-family:${DISPLAY}; font-weight:800;">JP Holecka <span style="color:${MAGENTA};">//</span> CEO/Founder</p>
                                 </div>
-                                
+
                                 <!-- Unsubscribe Footer -->
-                                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.10); font-size: 12px; color: rgba(244,246,251,0.4);">
-                                    <p style="margin: 0;">
-                                        You received this email because you used the Rapid MVP Validator. 
-                                        <a href="${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?email=${encodeURIComponent(email)}" style="color: rgba(244,246,251,0.6); text-decoration: underline;">Unsubscribe</a>
+                                <div style="margin-top:40px; padding-top:20px; border-top:1px solid ${LINE}; font-family:${MONO}; font-size:11px; letter-spacing:0.04em; color:${FAINT};">
+                                    <p style="margin:0;">
+                                        You received this email because you used the Rapid MVP Validator.
+                                        <a href="${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?email=${encodeURIComponent(email)}" style="color:${MUTE}; text-decoration:underline;">Unsubscribe</a>
                                     </p>
                                 </div>
                             </div>
@@ -226,7 +246,7 @@ function getRandomSubject(score: number) {
         "This MVP can work, but only if executed carefully"
     ];
 
-    // We can still keep the high score ones if the score is exceptionally high, 
+    // We can still keep the high score ones if the score is exceptionally high,
     // but the user prefers the "Execution Sensitive" framing generally.
     const highScoreSubjects = [
         "Your MVP scored high. Don't ruin it with overbuilding.",
