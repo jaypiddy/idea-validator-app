@@ -83,14 +83,11 @@ header {
 .nav .brand:hover .wordmark { color: var(--magenta); }
 .nav .brand .sep { width: 1px; height: 20px; background: var(--line-light); }
 .nav .brand .label { font-family: var(--mono); font-weight: 700; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: rgba(250, 250, 247, .62); }
-.nav a.cta { flex: none; white-space: nowrap; font-family: var(--text); font-weight: 700; font-size: 13px; letter-spacing: .04em; border: 1px solid currentColor; padding: 9px 18px; transition: background .2s ease-out, color .2s ease-out, border-color .2s ease-out; }
-.nav a.cta:hover { background: var(--magenta); border-color: var(--magenta); color: var(--paper); }
 
-/* Header collapses to logo + CTA on narrow screens */
-@media (max-width: 720px) {
-  .nav { padding: 14px var(--gutter); gap: 14px; }
-  .nav .brand .sep, .nav .brand .label { display: none; }
-  .nav a.cta { padding: 8px 14px; font-size: 12px; }
+@media (max-width: 480px) {
+  .nav { padding: 14px var(--gutter); }
+  .nav .brand { gap: 10px; }
+  .nav .brand .label { font-size: 10px; letter-spacing: .08em; }
 }
 
 /* ---------- Button system ---------- */

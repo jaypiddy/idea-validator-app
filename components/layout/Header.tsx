@@ -17,7 +17,6 @@ export default function Header() {
                     <span className="sep" />
                     <span className="label">Rapid MVP Validator</span>
                 </Link>
-                <Link href="/validate" className="cta">Validate my MVP</Link>
             </div>
         </header>
     );
