@@ -11,20 +11,40 @@ async function addSubscriber(email: string, name: string, inputs: any) {
         return;
     }
 
-    const customFields = [
+    // Shared across both the go-to-market and internal/enterprise flows.
+    const sharedFields = [
         { Key: '[Whatspecificproblemareyousolving?]', Value: inputs.problem },
         { Key: '[Whathappensifthisproblemremainsunsolvedfor12months?]', Value: inputs.problem_impact },
-        { Key: '[Whoisexperiencingthispainmostacutely?]', Value: inputs.audience },
         { Key: '[Describeyoursolutioninonesentence.]', Value: inputs.solution },
         { Key: '[WhatpartofthissolutionMUSTworkfortheideatosurvive?]', Value: inputs.solution_critical_path },
         { Key: '[KeyfeaturesfortheMVP?]', Value: inputs.features },
-        { Key: '[ExistingCompetitors]', Value: inputs.competitors },
-        { Key: '[Whatbehaviormustchangeforthistosucceed?]', Value: inputs.market_behavior_change },
-        { Key: '[Whywilltheyswitchtoyou?]', Value: inputs.market },
         { Key: '[EstimatedTimeline]', Value: inputs.timeline },
         { Key: '[RoughBudget]', Value: inputs.budget },
         { Key: '[Whowouldownthisinternallyafterlaunch?]', Value: inputs.execution_owner },
-    ].filter(field => field.Value); // Only send defined values
+    ];
+
+    // Go-to-market product fields. Keys already exist in the CM list.
+    const gtmFields = [
+        { Key: '[Whoisexperiencingthispainmostacutely?]', Value: inputs.audience },
+        { Key: '[ExistingCompetitors]', Value: inputs.competitors },
+        { Key: '[Whatbehaviormustchangeforthistosucceed?]', Value: inputs.behavior_change },
+        { Key: '[Whywilltheyswitchtoyou?]', Value: inputs.differentiation },
+    ];
+
+    // Internal / enterprise tool fields. These [Key] names must be created in
+    // the Campaign Monitor list before they will sync (CM rejects unknown keys).
+    const internalFields = [
+        { Key: '[Whichteamsorroleswilluseit?]', Value: inputs.internal_users },
+        { Key: '[Whatmanualprocessorsystemdoesitreplace?]', Value: inputs.replaces },
+        { Key: '[Whatsystemsmustitconnectto?]', Value: inputs.integrations },
+        { Key: '[Whatmustchangeinhowpeoplework?]', Value: inputs.adoption },
+        { Key: '[Securitycomplianceordatagovernanceneeds?]', Value: inputs.compliance },
+    ];
+
+    const flowFields = inputs.projectType === 'internal' ? internalFields : gtmFields;
+
+    const customFields = [...sharedFields, ...flowFields]
+        .filter(field => field.Value); // Only send defined values
 
     try {
         const auth = Buffer.from(`${apiKey}:x`).toString('base64');
