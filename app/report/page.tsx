@@ -202,7 +202,7 @@ export default function ReportPage() {
                             <Metric label={readinessLabels.market} score={result.readiness.market} />
                             <Metric label={readinessLabels.tech} score={result.readiness.tech} />
                             <Metric label={readinessLabels.diff} score={result.readiness.diff} />
-                            <Metric label="Execution risk" score={result.readiness.risk} />
+                            <Metric label="Execution readiness" score={result.readiness.risk} />
                         </div>
                     </section>
 
