@@ -101,7 +101,7 @@ The wizard step list is built **dynamically** from the selected `projectType` ([
 
 ## Local development
 
-> **Heads up:** install with `--legacy-peer-deps`. There's a pre-existing peer conflict (`@next/third-parties@14` vs `next@16`). The committed lockfile is consistent, so the Docker build's `npm ci` is unaffected — this flag is only needed for local `npm install`.
+> **Heads up:** there's a pre-existing peer conflict (`@next/third-parties@14` vs `next@16`), so installs need `--legacy-peer-deps`. This applies **both** locally (`npm install --legacy-peer-deps`) **and** in the Docker build (the `Dockerfile` runs `npm ci --legacy-peer-deps`). Proper long-term fix: bump `@next/third-parties` to a Next-16-compatible release and drop the flag.
 
 ```bash
 npm install --legacy-peer-deps
