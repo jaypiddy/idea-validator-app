@@ -9,7 +9,9 @@ import { AnalysisResult } from '@/lib/types';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import confetti from 'canvas-confetti';
 
-import { Zap, Info, Eye, Ban, Map, Lock, Check, ArrowLeft } from 'lucide-react';
+import { Lock, Check, ArrowLeft } from 'lucide-react';
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 declare global {
     interface Window {
@@ -98,7 +100,7 @@ export default function ReportPage() {
             revalidateOnFocus: false,
             shouldRetryOnError: false,
             onSuccess: (data) => {
-                // Optional: Keep localStorage sync if needed for other parts of app, 
+                // Optional: Keep localStorage sync if needed for other parts of app,
                 // otherwise SWR handles the session cache.
                 if (ideaData) {
                     localStorage.setItem('lastAnalysis', JSON.stringify({
@@ -134,8 +136,8 @@ export default function ReportPage() {
                 const particleCount = 50 * (timeLeft / duration);
 
                 // Since particles fall down, start a bit higher than random
-                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#0060FF', '#FD2E90', '#FFFFFF'] });
-                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#0060FF', '#FD2E90', '#FFFFFF'] });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#FD2E90', '#121315', '#FAFAF7'] });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#FD2E90', '#121315', '#FAFAF7'] });
             }, 250);
 
             return () => clearInterval(interval);
@@ -143,330 +145,207 @@ export default function ReportPage() {
     }, [result, loading]);
 
     if (loading) return <LoadingScreen />;
-    if (error) return <div className="p-8 text-red-500 text-center">{error}</div>;
+    if (error) return (
+        <div className="rep-loading">
+            <p className="rep-loading-text" style={{ color: 'var(--magenta)' }}>{error}</p>
+        </div>
+    );
     if (!result) return null;
 
     return (
-        <div className="min-h-screen p-6 md:p-12 relative overflow-x-hidden bg-[#121315] text-[#F4F6FB]">
-            <button
-                onClick={() => router.push('/validate')}
-                className="fixed top-6 left-6 text-sm text-neutral-400 hover:text-white flex items-center gap-2 transition-colors z-50 bg-neutral-900/50 backdrop-blur px-4 py-2 rounded-full border border-neutral-800"
-            >
-                <ArrowLeft className="w-4 h-4" /> Edit Inputs
-            </button>
+        <div className="rep-main">
+            <div className="rep-shell">
+                <button onClick={() => router.push('/validate')} className="rep-back">
+                    <ArrowLeft className="w-4 h-4" /> Edit inputs
+                </button>
 
-            <div className="max-w-4xl mx-auto space-y-16">
-
-                {/* 1. HERO SECTION: Score & Interpretation */}
-                <div className="text-center space-y-6 pt-12">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                {/* Score hero */}
+                <div className="rep-hero">
+                    <motion.p
+                        className="rep-eyebrow"
+                        initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
+                        transition={{ duration: 0.5, ease: EASE }}
                     >
-                        <h2 className="text-xl font-medium text-ps-blue mb-2 tracking-wide uppercase">
-                            Analysis Complete
-                        </h2>
-                    </motion.div>
-
-                    <div className="relative inline-block">
-                        <motion.h1
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="text-7xl md:text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-ps-blue to-ps-pink tracking-tighter"
-                        >
-                            <AnimatedNumber value={result.score} />
-                            <span className="text-4xl text-neutral-600 font-normal">/100</span>
-                        </motion.h1>
-                    </div>
-
-                    <div className="space-y-2">
-                        <p className="text-2xl text-white font-medium">
-                            {getScoreLabel(result.score)}
-                        </p>
-                        <div className="pt-2">
-                            <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-medium ${getComplexityColor(result.complexity)}`}>
-                                <Zap className="w-4 h-4" />
-                                <span>Tech Complexity:</span>
-                                <span>{result.complexity}</span>
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-center gap-2 text-sm text-neutral-500">
-                            <Info className="w-4 h-4" />
-                            <p>This score predicts cost of unknowns, not market success.</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 2. MVP READINESS (Teaser) */}
-                <div className="bg-neutral-900/40 p-8 rounded-3xl border border-neutral-800 backdrop-blur-sm">
-                    <h3 className="text-xl font-bold text-white mb-6">MVP Readiness Breakdown</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                        <ReadinessBar
-                            label="Problem Clarity"
-                            score={result.readiness.problem}
-                            color="bg-ps-blue"
-                            description="How clearly defined the user pain point is. High score = Focus on a specific, acute problem."
-                        />
-                        <ReadinessBar
-                            label="Market Pressure"
-                            score={result.readiness.market}
-                            color="bg-ps-violet"
-                            description="Urgency of demand. High score = 'Hair on fire' problem (Pull). Low score = Requires education (Push)."
-                        />
-                        <ReadinessBar
-                            label="Tech Feasibility"
-                            score={result.readiness.tech}
-                            color="bg-green-500"
-                            description="Ease of implementation. High score = Standard tech/Proven patterns. Low score = Complex R&D needed."
-                        />
-                        <ReadinessBar
-                            label="Differentiation"
-                            score={result.readiness.diff}
-                            color="bg-orange-500"
-                            description="Uniqueness in the market. High score = Clear 'moat' or novel approach. Low score = Commodity."
-                        />
-                        <ReadinessBar
-                            label="Execution Risk"
-                            score={result.readiness.risk}
-                            color="bg-red-500"
-                            description="Operational complexity. High score = Many moving parts/dependencies. Low score = Pure software build."
-                        />
-                    </div>
-                </div>
-
-                {/* 2.5 BLINDSPOT / UNSAID RISK */}
-                {result.unsaidRisk && (
+                        Analysis complete
+                    </motion.p>
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        className="rep-score"
+                        initial={{ opacity: 0, y: 14 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="bg-red-900/10 p-6 md:p-8 rounded-3xl border border-red-500/20 flex flex-col md:flex-row gap-6 items-start"
+                        transition={{ duration: 0.6, ease: EASE, delay: 0.08 }}
                     >
-                        <div className="p-3 bg-red-500/10 rounded-xl text-2xl border border-red-500/20">
-                            <Eye className="w-8 h-8 text-red-400" />
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className="text-red-400 font-bold text-sm uppercase tracking-widest">The Blindspot</h3>
-                            <p className="text-xl text-neutral-200 font-light leading-relaxed">
-                                &quot;{result.unsaidRisk}&quot;
-                            </p>
-                            <p className="text-xs text-neutral-500 pt-1">
-                                *This is the critical risk factor our AI detected based on your specific combination of answers.
-                            </p>
-                        </div>
+                        <AnimatedNumber value={result.score} /><span className="out">/100</span>
                     </motion.div>
-                )}
-
-                {/* 3. TRADITIONAL vs REALITY */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="bg-neutral-900/50 p-8 rounded-3xl border border-neutral-800">
-                        <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-2">Traditional Build</h3>
-                        <p className="text-4xl font-bold text-white mb-2">{result.monthsToBuild} Months</p>
-                        <p className="text-sm text-neutral-400 leading-relaxed">
-                            {result.traditionalBuildRationale}
-                        </p>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-ps-blue/20 to-ps-violet/20 p-8 rounded-3xl border border-ps-blue/30">
-                        <h3 className="text-ps-blue text-sm uppercase tracking-wider mb-2">Rapid MVP Build</h3>
-                        <p className="text-4xl font-bold text-white mb-2">
-                            {rapidWeeks} Weeks
-                        </p>
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-xs text-neutral-300">
-                                <span>AI Accelerated</span>
-                                <span>{result.aiHumanMix.aiPercent}%</span>
-                            </div>
-                            <div className="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-                                <div className="h-full bg-ps-blue" style={{ width: `${result.aiHumanMix.aiPercent}%` }} />
-                            </div>
-                            <div className="flex justify-between text-xs text-neutral-300 pt-1">
-                                <span>Human Expert Led</span>
-                                <span>{result.aiHumanMix.humanPercent}%</span>
-                            </div>
-                            <div className="w-full bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-                                <div className="h-full bg-ps-violet" style={{ width: `${result.aiHumanMix.humanPercent}%` }} />
-                            </div>
-                        </div>
+                    <p className="rep-verdict-label">{getScoreLabel(result.score)}</p>
+                    <div className="rep-meta">
+                        <span className="rep-chip pink">Tech complexity · {result.complexity}</span>
+                        <span className="rep-note">This score predicts cost of unknowns, not market success.</span>
                     </div>
                 </div>
 
-                {/* 4. GATED SECTION (Blur Filter) */}
-                <div className="relative">
-                    {/* The blurred content (Teaser of deep value) */}
-                    <div className="blur-sm select-none opacity-50 pointer-events-none space-y-8">
+                <div className="rep-sections">
 
-                        {/* Fake Kill List */}
-                        <div className="bg-neutral-900/30 p-8 rounded-3xl border border-red-900/20">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Ban className="w-6 h-6 text-red-400" />
-                                <h3 className="text-xl font-bold text-red-400">Scope Kill List (Excluded from Phase 1)</h3>
-                            </div>
-                            <ul className="space-y-3">
-                                <li className="h-4 bg-neutral-800/50 rounded w-3/4"></li>
-                                <li className="h-4 bg-neutral-800/50 rounded w-1/2"></li>
-                                <li className="h-4 bg-neutral-800/50 rounded w-5/6"></li>
-                            </ul>
+                    {/* MVP Readiness */}
+                    <section className="rep-card">
+                        <p className="rep-card-kicker">Signal breakdown</p>
+                        <h3 className="rep-card-h">MVP Readiness</h3>
+                        <div className="rep-metrics">
+                            <Metric label="Problem clarity" score={result.readiness.problem} />
+                            <Metric label="Market pressure" score={result.readiness.market} />
+                            <Metric label="Tech feasibility" score={result.readiness.tech} />
+                            <Metric label="Differentiation" score={result.readiness.diff} />
+                            <Metric label="Execution risk" score={result.readiness.risk} />
                         </div>
+                    </section>
 
-                        {/* Fake Roadmap */}
-                        <div className="bg-neutral-900/30 p-8 rounded-3xl border border-green-900/20">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Map className="w-6 h-6 text-green-400" />
-                                <h3 className="text-xl font-bold text-green-400">{rapidWeeks}-Week Execution Plan</h3>
-                            </div>
-                            <div className="space-y-4">
-                                <div className="h-20 bg-neutral-800/50 rounded-xl"></div>
-                                <div className="h-20 bg-neutral-800/50 rounded-xl"></div>
-                            </div>
-                        </div>
+                    {/* Blindspot / unsaid risk */}
+                    {result.unsaidRisk && (
+                        <section className="rep-card">
+                            <p className="rep-card-kicker">The blindspot</p>
+                            <p className="rep-quote">&ldquo;{result.unsaidRisk}&rdquo;</p>
+                            <p className="rep-body" style={{ marginTop: 16 }}>
+                                The critical non-technical risk our analysis surfaced from your specific combination of answers.
+                            </p>
+                        </section>
+                    )}
 
+                    {/* Traditional vs Rapid */}
+                    <div className="rep-grid-2">
+                        <section className="rep-card paper">
+                            <p className="rep-card-kicker">Traditional build</p>
+                            <p className="rep-big">{result.monthsToBuild} Months</p>
+                            <p className="rep-body">{result.traditionalBuildRationale}</p>
+                        </section>
+                        <section className="rep-card">
+                            <p className="rep-card-kicker">Rapid MVP build</p>
+                            <p className="rep-big">{rapidWeeks} Weeks</p>
+                            <div className="rep-metrics" style={{ marginTop: 18 }}>
+                                <Metric label="AI accelerated" score={result.aiHumanMix.aiPercent} />
+                                <Metric label="Human expert led" score={result.aiHumanMix.humanPercent} />
+                            </div>
+                        </section>
                     </div>
 
-                    {/* OVERLAY: Email Capture */}
-                    <div className="absolute inset-0 z-10 flex items-center justify-center p-4">
-                        {!emailSent ? (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="bg-neutral-900 border border-neutral-700 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center space-y-6"
-                            >
-                                <div className="w-16 h-16 bg-ps-blue/20 text-ps-blue rounded-full flex items-center justify-center mx-auto text-3xl">
-                                    <Lock className="w-8 h-8" />
+                    {/* Gated deep-dive */}
+                    <div className="rep-gate-wrap">
+                        <div className="rep-gate-blur">
+                            <section className="rep-card paper">
+                                <p className="rep-card-kicker">Scope kill list — excluded from phase 1</p>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 6 }}>
+                                    <div className="rep-skel" style={{ width: '75%' }} />
+                                    <div className="rep-skel" style={{ width: '52%' }} />
+                                    <div className="rep-skel" style={{ width: '84%' }} />
                                 </div>
-                                <div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">Unlock the Full Report</h3>
-                                    <p className="text-neutral-400 text-sm">
-                                        Get the detailed <strong>Scope Kill List</strong>, <strong>{rapidWeeks}-Week Roadmap</strong>, and <strong>Buy/Build Recommendations</strong> sent to your inbox.
+                            </section>
+                            <section className="rep-card paper">
+                                <p className="rep-card-kicker">{rapidWeeks}-week execution plan</p>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 6 }}>
+                                    <div className="rep-skel" style={{ height: 64 }} />
+                                    <div className="rep-skel" style={{ height: 64 }} />
+                                </div>
+                            </section>
+                        </div>
+
+                        <div className="rep-gate">
+                            {!emailSent ? (
+                                <motion.div
+                                    className="rep-gate-card"
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, ease: EASE }}
+                                >
+                                    <div className="rep-gate-icon"><Lock className="w-6 h-6" /></div>
+                                    <h3 className="rep-gate-h">Unlock the full report</h3>
+                                    <p className="rep-gate-p">
+                                        Get the detailed <b>Scope Kill List</b>, <b>{rapidWeeks}-week roadmap</b>, and <b>Buy/Build recommendations</b> sent to your inbox.
                                     </p>
-                                </div>
-
-                                <form className="space-y-3" onSubmit={handleEmailSubmit}>
-                                    <div className="space-y-3">
+                                    <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                         <input
+                                            className="rep-input"
                                             type="text"
-                                            placeholder="Your Name"
+                                            placeholder="Your name"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            className="w-full bg-black border border-neutral-700 rounded-xl p-4 text-center focus:ring-2 focus:ring-ps-blue outline-none text-white placeholder:text-neutral-600"
                                             required
                                             disabled={sendingEmail}
                                         />
                                         <input
+                                            className="rep-input"
                                             type="email"
-                                            placeholder="Enter your email"
+                                            placeholder="Email address"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="w-full bg-black border border-neutral-700 rounded-xl p-4 text-center focus:ring-2 focus:ring-ps-blue outline-none text-white placeholder:text-neutral-600"
                                             required
                                             disabled={sendingEmail}
                                         />
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        disabled={sendingEmail}
-                                        className="w-full bg-white text-black font-bold text-lg py-4 rounded-xl hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {sendingEmail ? 'Sending...' : 'Send Me The Report'}
-                                    </button>
-                                </form>
-                                <p className="text-xs text-neutral-600">
-                                    We respect your inbox. No spam, just high-signal product thinking.
-                                </p>
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="bg-neutral-900 border border-green-900/50 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center space-y-6"
-                            >
-                                <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto text-3xl">
-                                    <Check className="w-8 h-8" />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">Report Sent!</h3>
-                                    <p className="text-neutral-400 text-sm">
-                                        Check your inbox for the deep dive analysis.
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={() => router.push('/validate')}
-                                    className="text-neutral-400 hover:text-white text-sm underline"
+                                        <button className="rep-submit" type="submit" disabled={sendingEmail}>
+                                            {sendingEmail ? 'Sending…' : 'Send me the report →'}
+                                        </button>
+                                    </form>
+                                    <p className="rep-fineprint">No spam. Just high-signal product thinking.</p>
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    className="rep-gate-card"
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, ease: EASE }}
                                 >
-                                    Analyze another idea
-                                </button>
-                            </motion.div>
-                        )}
+                                    <div className="rep-gate-icon"><Check className="w-6 h-6" /></div>
+                                    <h3 className="rep-gate-h">Report sent</h3>
+                                    <p className="rep-gate-p">Check your inbox for the deep-dive analysis.</p>
+                                    <button className="rep-textlink" onClick={() => router.push('/validate')}>
+                                        Analyze another idea
+                                    </button>
+                                </motion.div>
+                            )}
+                        </div>
                     </div>
-                </div>
 
+                </div>
             </div>
         </div>
     );
 }
 
-function ReadinessBar({ label, score, color, description }: { label: string, score: number, color: string, description: string }) {
+function Metric({ label, score }: { label: string; score: number }) {
     return (
-        <div className="space-y-3 group/tooltip relative">
-
-            {/* Tooltip Content (appears on hover of the entire block) */}
-            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-48 bg-neutral-800 text-xs text-neutral-300 p-3 rounded-lg border border-neutral-700 shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-20 text-center">
-                {description}
-                <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-neutral-800 border-b border-r border-neutral-700 transform rotate-45"></div>
+        <div>
+            <div className="rep-metric-top">
+                <span className="rep-metric-label">{label}</span>
+                <span className="rep-metric-val">{score}</span>
             </div>
-
-            <div className="flex justify-between items-end h-32 pb-2 relative group overflow-hidden bg-neutral-900/50 rounded-lg border border-white/5">
-                {/* Bar */}
-                <div className="w-full relative h-full flex items-end">
-                    <motion.div
-                        initial={{ height: 0 }}
-                        animate={{ height: `${score}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className={`w-full ${color} opacity-80 group-hover:opacity-100 transition-opacity`}
-                    />
-                </div>
-                {/* Score Label (absolute centered) */}
-                <span className="absolute bottom-2 left-0 w-full text-center text-xs font-bold text-white/90 drop-shadow-md">
-                    {score}
-                </span>
-            </div>
-
-            <div className="flex items-center justify-center gap-1.5 text-neutral-400 group-hover/tooltip:text-neutral-200 transition-colors cursor-help">
-                <p className="text-xs font-medium uppercase tracking-tight text-center">{label}</p>
-                <Info className="w-3 h-3 opacity-50" />
+            <div className="rep-bar-track">
+                <motion.div
+                    className="rep-bar-fill"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: Math.max(0, Math.min(100, score)) / 100 }}
+                    transition={{ duration: 0.9, ease: EASE }}
+                />
             </div>
         </div>
-    )
+    );
 }
 
 function getScoreLabel(score: number) {
-    if (score >= 90) return "🦄 Venture Ready";
-    if (score >= 75) return "🚀 Strong Signal";
-    if (score >= 60) return "⚠️ Execution Heavy";
-    if (score >= 40) return "🚧 Risky Foundation";
-    return "🛑 Back to Drawing Board";
-}
-
-function getComplexityColor(complexity: string = "High") {
-    const c = complexity.toLowerCase();
-    if (c.includes("low")) return "bg-green-500/10 border-green-500/30 text-green-400";
-    if (c.includes("medium")) return "bg-blue-500/10 border-blue-500/30 text-blue-400";
-    if (c.includes("high")) return "bg-orange-500/10 border-orange-500/30 text-orange-400";
-    if (c.includes("rocket")) return "bg-red-500/10 border-red-500/30 text-red-400";
-    return "bg-neutral-800 border-neutral-700 text-neutral-400";
+    if (score >= 90) return "Venture Ready";
+    if (score >= 75) return "Strong Signal";
+    if (score >= 60) return "Execution Heavy";
+    if (score >= 40) return "Risky Foundation";
+    return "Back to the Drawing Board";
 }
 
 function LoadingScreen() {
-    const [text, setText] = useState("Analyzing market impact...");
+    const [text, setText] = useState("Analyzing market impact…");
 
     useEffect(() => {
         const texts = [
-            "Calculating technical debt risk...",
-            "Identifying scope creep...",
-            "Optimizing for single-flow MVP...",
-            "Benchmarking against competitors...",
-            "Simulating 6-week build plan..."
+            "Calculating technical debt risk…",
+            "Identifying scope creep…",
+            "Optimizing for single-flow MVP…",
+            "Benchmarking against competitors…",
+            "Simulating 6-week build plan…"
         ];
         let i = 0;
         const interval = setInterval(() => {
@@ -477,18 +356,9 @@ function LoadingScreen() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center space-y-6">
-            <div className="w-16 h-16 border-4 border-ps-blue border-t-transparent rounded-full animate-spin" />
-            <p className="text-ps-blue animate-pulse font-mono text-lg">{text}</p>
+        <div className="rep-loading">
+            <div className="rep-spinner" />
+            <p className="rep-loading-text">{text}</p>
         </div>
     );
-}
-
-// Unused for now, but kept if needed later
-function getCongratulatoryMessage(score: number) {
-    if (score >= 90) return "🚀 Absolutely Legendary!";
-    if (score >= 80) return "✨ Incredible Potential!";
-    if (score >= 70) return "🔥 Solid Concept!";
-    if (score >= 60) return "👍 Good Foundation.";
-    return "💡 Interesting Start...";
 }
