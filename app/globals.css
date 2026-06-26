@@ -250,6 +250,17 @@ header {
 .wiz-rule { height: 1px; background: rgba(255, 255, 255, .12); margin: 8px 0; }
 @media (max-width: 600px) { .wiz-intro-grid { grid-template-columns: 1fr; } }
 
+/* Project-type picker */
+.wiz-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.wiz-choice { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 22px; border: 1px solid rgba(255, 255, 255, .14); background: var(--ink-soft); cursor: pointer; transition: border-color .2s ease-out, background .2s ease-out; }
+.wiz-choice:hover { border-color: rgba(255, 255, 255, .32); }
+.wiz-choice.is-selected { border-color: var(--magenta); box-shadow: inset 0 0 0 1px var(--magenta); }
+.wiz-choice input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+.wiz-choice-icon { width: 24px; height: 24px; color: var(--magenta); }
+.wiz-choice-title { font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -.01em; color: var(--paper); }
+.wiz-choice-desc { font-size: 13.5px; line-height: 1.5; color: rgba(244, 246, 251, .62); }
+@media (max-width: 600px) { .wiz-choices { grid-template-columns: 1fr; } }
+
 /* Nav row */
 .wiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, .12); }
 /* Ghost buttons sit on the dark card / modal — give them light text */

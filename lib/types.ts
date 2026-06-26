@@ -31,32 +31,57 @@ export type AnalysisResult = {
     tradeoff?: string; // New field for "The Tradeoff" section
 };
 
+// Which kind of build this is. Drives the question set, the analysis lens,
+// and the report's readiness dimension labels.
+export type ProjectType = 'gtm' | 'internal';
+
 export type FormData = {
+    projectType: ProjectType;
+
+    // Shared across both flows
     problem: string;
-    problem_impact: string; // New: What happens if unsolved...
-    audience: string;
+    problem_impact: string;
     solution: string;
-    solution_critical_path: string; // New: What part must work...
+    solution_critical_path: string;
     features: string;
-    market: string;
-    market_behavior_change: string; // New: What behavior must change...
-    competitors: string;
     timeline: string;
     budget: string;
-    execution_owner: string; // New: Who would own this...
+    execution_owner: string;
+
+    // Go-to-market product only
+    audience: string;          // target customer
+    competitors: string;       // status quo / competitors
+    differentiation: string;   // why they switch to you
+    behavior_change: string;   // behavior that must change to adopt
+
+    // Internal / enterprise tool only
+    internal_users: string;    // which teams/roles, and roughly how many
+    replaces: string;          // manual process / spreadsheet / legacy system
+    integrations: string;      // systems it must connect to
+    adoption: string;          // what must change in how people work + who drives it
+    compliance: string;        // security / compliance / data-governance needs
 }
 
 export const initialFormData: FormData = {
+    projectType: 'gtm',
+
     problem: '',
     problem_impact: '',
-    audience: '',
     solution: '',
     solution_critical_path: '',
     features: '',
-    market: '',
-    market_behavior_change: '',
-    competitors: '',
     timeline: '',
     budget: '',
     execution_owner: '',
+
+    audience: '',
+    competitors: '',
+    differentiation: '',
+    behavior_change: '',
+
+    internal_users: '',
+    replaces: '',
+    integrations: '',
+    adoption: '',
+    compliance: '',
 }

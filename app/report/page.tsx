@@ -152,6 +152,13 @@ export default function ReportPage() {
     );
     if (!result) return null;
 
+    // Readiness dimensions are reframed for internal/enterprise builds.
+    let projectType = 'gtm';
+    try { if (ideaData) projectType = JSON.parse(ideaData).projectType || 'gtm'; } catch { /* default gtm */ }
+    const readinessLabels = projectType === 'internal'
+        ? { market: 'Adoption pressure', tech: 'Integration feasibility', diff: 'Process fit' }
+        : { market: 'Market pressure', tech: 'Tech feasibility', diff: 'Differentiation' };
+
     return (
         <div className="rep-main">
             <div className="rep-shell">
@@ -192,9 +199,9 @@ export default function ReportPage() {
                         <h3 className="rep-card-h">MVP Readiness</h3>
                         <div className="rep-metrics">
                             <Metric label="Problem clarity" score={result.readiness.problem} />
-                            <Metric label="Market pressure" score={result.readiness.market} />
-                            <Metric label="Tech feasibility" score={result.readiness.tech} />
-                            <Metric label="Differentiation" score={result.readiness.diff} />
+                            <Metric label={readinessLabels.market} score={result.readiness.market} />
+                            <Metric label={readinessLabels.tech} score={result.readiness.tech} />
+                            <Metric label={readinessLabels.diff} score={result.readiness.diff} />
                             <Metric label="Execution risk" score={result.readiness.risk} />
                         </div>
                     </section>

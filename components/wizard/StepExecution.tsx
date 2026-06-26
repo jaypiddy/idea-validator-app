@@ -2,7 +2,8 @@
 import { useFormContext } from 'react-hook-form';
 
 export default function StepExecution() {
-    const { register } = useFormContext();
+    const { register, watch } = useFormContext();
+    const isInternal = watch('projectType') === 'internal';
 
     return (
         <div>
@@ -41,13 +42,21 @@ export default function StepExecution() {
                 </div>
 
                 <div className="wiz-field">
-                    <label>Who would own this internally after launch?</label>
+                    <label>
+                        {isInternal
+                            ? 'Who owns this after launch — and who has to sign off?'
+                            : 'Who would own this internally after launch?'}
+                    </label>
                     <p className="wiz-hint">
-                        The &quot;Owner&quot; determines the long-term tech debt risk. A CTO ensures maintainability. A Marketing Manager prioritizes speed.
+                        {isInternal
+                            ? 'Ownership and approvals drive timeline risk. IT, security, and stakeholder sign-off can add weeks before a line of code ships.'
+                            : 'The “Owner” determines the long-term tech debt risk. A CTO ensures maintainability. A Marketing Manager prioritizes speed.'}
                     </p>
                     <input
                         {...register('execution_owner', { required: true })}
-                        placeholder="e.g. Me (Non-technical Founder), A hired PM, My Co-founder (CTO)"
+                        placeholder={isInternal
+                            ? 'e.g. Owned by IT Ops; needs security + the COO to sign off'
+                            : 'e.g. Me (Non-technical Founder), A hired PM, My Co-founder (CTO)'}
                     />
                 </div>
             </div>

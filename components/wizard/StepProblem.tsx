@@ -24,7 +24,7 @@ export default function StepProblem() {
                 </div>
 
                 <div className="wiz-field">
-                    <label>What happens if this problem remains unsolved for 12 months?</label>
+                    <label>What does it cost your customers if this stays unsolved?</label>
                     <p className="wiz-hint">
                         High-pain problems justify higher technical risk. Low-pain problems require frictionless, low-complexity solutions.
                     </p>
@@ -35,9 +35,9 @@ export default function StepProblem() {
                 </div>
 
                 <div className="wiz-field">
-                    <label>Who is experiencing this pain most acutely?</label>
+                    <label>Who feels this most acutely &mdash; and would pay to fix it?</label>
                     <p className="wiz-hint">
-                        Enterprise users often demand rigid security (SSO, Audit Logs) and legacy compatibility, whereas consumer apps prioritize extreme design polish and instant scalability.
+                        Your buyer shapes the build. Enterprise customers demand security (SSO, audit logs) and legacy compatibility; consumers prioritize polish and instant scale.
                     </p>
                     <input
                         {...register('audience', { required: true })}
