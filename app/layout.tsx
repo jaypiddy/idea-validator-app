@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
-import { Rubik } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import LinkedInTag from "@/components/LinkedInTag";
-
-const rubik = Rubik({
-  subsets: ["latin"],
-  variable: "--font-rubik",
-  weight: ["300", "400", "500", "700"], // 300 (Light), 400 (Regular), 500 (Medium), 700 (Bold)
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://rapidmvp.powershifter.com"),
@@ -64,13 +57,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-neutral-950" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Adobe Fonts (Typekit) — Articulat CF, Fraunces, Config Mono */}
+        <link rel="stylesheet" href="https://use.typekit.net/xkk7api.css" />
+      </head>
       <body
-        className={`${rubik.className} ${rubik.variable} antialiased text-white selection:bg-blue-500/30 font-light flex flex-col min-h-screen`}
+        className="antialiased flex flex-col min-h-screen"
         suppressHydrationWarning
       >
         <Header />
-        <main className="pt-20 flex-grow">
+        <main className="flex-grow">
           {children}
         </main>
         <Footer />

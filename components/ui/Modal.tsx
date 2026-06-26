@@ -20,41 +20,35 @@ export function Modal({ isOpen, onClose, title, children, actionLabel, onAction 
     return createPortal(
         <AnimatePresence>
             {isOpen && (
-                <>
-                    {/* Backdrop */}
+                <div className="wiz-modal">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                        className="wiz-modal-backdrop"
                     />
-
-                    {/* Modal Content */}
-                    <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none p-4">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-neutral-900 border border-neutral-800 w-full max-w-md rounded-2xl p-6 shadow-2xl pointer-events-auto"
-                        >
-                            <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-                            <div className="text-neutral-400 mb-6">
-                                {children}
-                            </div>
-                            <div className="flex justify-end gap-3">
-                                <Button variant="secondary" onClick={onClose}>
-                                    {actionLabel ? 'Cancel' : 'Close'}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.96, y: 16 }}
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="wiz-modal-card"
+                    >
+                        <h3>{title}</h3>
+                        <div>{children}</div>
+                        <div className="wiz-modal-actions">
+                            <Button variant="ghost" onClick={onClose}>
+                                {actionLabel ? 'Cancel' : 'Close'}
+                            </Button>
+                            {actionLabel && onAction && (
+                                <Button variant="primary" onClick={onAction}>
+                                    {actionLabel}
                                 </Button>
-                                {actionLabel && onAction && (
-                                    <Button variant="primary" onClick={onAction}>
-                                        {actionLabel}
-                                    </Button>
-                                )}
-                            </div>
-                        </motion.div>
-                    </div>
-                </>
+                            )}
+                        </div>
+                    </motion.div>
+                </div>
             )}
         </AnimatePresence>,
         document.body

@@ -41,9 +41,11 @@ export default function ValidatePage() {
     }, [methods]);
 
     const CurrentStepComponent = steps[currentStep];
+    const totalSteps = steps.length - 1;
+    const pct = Math.round((currentStep / totalSteps) * 100);
+    const isLastStep = currentStep === steps.length - 1;
 
     const handleNext = async () => {
-        const isLastStep = currentStep === steps.length - 1;
         // Don't validate form on intro step
         const valid = currentStep === 0 ? true : await methods.trigger();
 
@@ -76,25 +78,29 @@ export default function ValidatePage() {
     return (
         <WizardLayout>
             <FormProvider {...methods}>
-                {/* Progress Bar (Hidden on Intro) */}
+                <div className="wiz-kicker">
+                    <span className="eyebrow">Power Shifter · MVP Validator</span>
+                </div>
+
+                {/* Progress (hidden on intro) */}
                 {currentStep > 0 && (
-                    <div className="mb-8 space-y-2 animate-in fade-in duration-300">
-                        <div className="flex justify-between text-xs text-neutral-400">
-                            <span>Step {currentStep} of {steps.length - 1}</span>
-                            <span>{Math.round(((currentStep) / (steps.length - 1)) * 100)}%</span>
+                    <div className="wiz-progress">
+                        <div className="wiz-progress-top">
+                            <span>Step {currentStep} of {totalSteps}</span>
+                            <span>{pct}%</span>
                         </div>
-                        <div className="w-full bg-neutral-900 h-2 rounded-full overflow-hidden border border-neutral-800">
+                        <div className="wiz-track">
                             <motion.div
-                                className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${((currentStep) / (steps.length - 1)) * 100}%` }}
-                                transition={{ duration: 0.5, ease: "easeInOut" }}
+                                className="wiz-fill"
+                                initial={{ scaleX: 0 }}
+                                animate={{ scaleX: currentStep / totalSteps }}
+                                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                             />
                         </div>
                     </div>
                 )}
 
-                <Card className="mb-8">
+                <Card>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentStep}
@@ -107,31 +113,23 @@ export default function ValidatePage() {
                         </motion.div>
                     </AnimatePresence>
 
-                    <div className="flex flex-col items-end mt-8 pt-8 border-t border-[rgba(255,255,255,0.10)]">
-                        <div className="flex justify-between w-full">
-                            <Button
-                                variant="ghost"
-                                onClick={handleBack}
-                                disabled={currentStep === 0}
-                                className={currentStep === 0 ? 'opacity-0 pointer-events-none' : ''}
-                            >
-                                Back
-                            </Button>
-                            <Button
-                                variant="primary"
-                                onClick={handleNext}
-                                className={currentStep === 0 ? 'bg-blue-600 hover:bg-blue-500 px-8' : ''}
-                            >
-                                {currentStep === 0 ? 'Start MVP Analysis' : (currentStep === steps.length - 1 ? 'Analyze Idea' : 'Next Step')}
-                            </Button>
-                        </div>
-                        {currentStep === 0 && (
-                            <p className="text-xs text-neutral-500 mt-3 mr-1">
-                                Takes ~5 minutes. No obligation.
-                            </p>
-                        )}
+                    <div className="wiz-nav">
+                        <Button
+                            variant="ghost"
+                            onClick={handleBack}
+                            disabled={currentStep === 0}
+                        >
+                            ← Back
+                        </Button>
+                        <Button variant="primary" onClick={handleNext}>
+                            {currentStep === 0 ? 'Start MVP Analysis →' : (isLastStep ? 'Analyze Idea →' : 'Next Step →')}
+                        </Button>
                     </div>
                 </Card>
+
+                {currentStep === 0 && (
+                    <p className="wiz-note">Takes ~5 minutes · No obligation</p>
+                )}
 
                 {/* No Changes Modal */}
                 <Modal
