@@ -23,7 +23,7 @@ export default function Footer() {
                     <a href="https://www.powershifter.com/privacy-policy" target="_blank" rel="noopener noreferrer">Cookies</a>
                 </div>
 
-                <div className="foot-build">v2.0-flash · Build {new Date().toISOString().split('T')[0]}</div>
+                <div className="foot-build">{process.env.GEMINI_MODEL || 'gemini-2.5-flash'} · Build {new Date().toISOString().split('T')[0]}</div>
             </div>
         </footer>
     );
